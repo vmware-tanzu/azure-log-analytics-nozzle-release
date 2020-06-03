@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/lager"
-	"github.com/Azure/oms-log-analytics-firehose-nozzle/caching"
-	"github.com/Azure/oms-log-analytics-firehose-nozzle/client"
-	"github.com/Azure/oms-log-analytics-firehose-nozzle/firehose"
-	"github.com/Azure/oms-log-analytics-firehose-nozzle/omsnozzle"
+	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/caching"
+	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/client"
+	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/firehose"
+	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/omsnozzle"
 	"github.com/cloudfoundry-community/go-cfclient"
 	"gopkg.in/alecthomas/kingpin.v2"
 )

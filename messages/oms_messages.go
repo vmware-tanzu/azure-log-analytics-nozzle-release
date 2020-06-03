@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/oms-log-analytics-firehose-nozzle/caching"
+	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/caching"
 	events "github.com/cloudfoundry/sonde-go/events"
 )
 

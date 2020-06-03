@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/Azure/oms-log-analytics-firehose-nozzle/caching"
+import "github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/caching"
 
 type MockCaching struct {
 	MockGetAppInfo  func(string) caching.AppInfo

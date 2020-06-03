@@ -50,8 +50,8 @@ uaac member add doppler.firehose ${FIREHOSE_USER}
 ### 3. Download the latest code
 
 ```
-git clone https://github.com/Azure/oms-log-analytics-firehose-nozzle.git
-cd oms-log-analytics-firehose-nozzle
+git clone https://github.com/pivotal/azure-oms-log-analytics-firehose-nozzle.git
+cd azure-oms-log-analytics-firehose-nozzle
 ```
 
 ### 4. Set environment variables in [manifest.yml](./manifest.yml)
