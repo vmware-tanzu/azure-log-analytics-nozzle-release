@@ -35,6 +35,8 @@ packages:
     instances: (( .properties.nozzle_instance_number.value ))
     memory: 512M
     no-route: true
+    env:
+      GOPACKAGENAME: github.com/pivotal/azure-oms-log-analytics-firehose-nozzle
   health_check: none
 
 # Include stemcell criteria if you don't want to accept the default.
@@ -45,7 +47,7 @@ packages:
 stemcell_criteria:
   os: ubuntu-xenial
   requires_cpi: false
-  version: '315'
+  version: '621'
 
 # Add properties you want to pass to your applications.
 # Properties specified here will not be configurable by the user.
