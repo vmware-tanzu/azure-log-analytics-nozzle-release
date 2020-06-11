@@ -4,10 +4,10 @@ applications:
   memory: 512M
   instances: 2
   buildpack: go_buildpack
-  command: oms-log-analytics-firehose-nozzle
   no-route: true
   health-check-type: none
   env:
+    GOPACKAGENAME: github.com/pivotal/azure-oms-log-analytics-firehose-nozzle
     OMS_WORKSPACE: CHANGE_ME
     OMS_KEY: CHANGE_ME
     OMS_POST_TIMEOUT: 10s
