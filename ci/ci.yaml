@@ -1,0 +1,151 @@
+---
+resource_types:
+- name: pcf-pool
+  source:
+    repository: cftoolsmiths/toolsmiths-envs-resource
+  type: docker-image
+resources:
+- name: azure-nozzle
+  type: git
+  source:
+    uri: git@github.com:pivotal/azure-oms-log-analytics-firehose-nozzle.git
+    branch: master
+    private_key: ((oratos-key))
+- name: 2.9-env
+  source:
+    api_token: ((toolsmith-api-key))
+    hostname: environments.toolsmiths.cf-app.com
+    pool_name: us_2_9
+  tags:
+  - cf-denver-shared-vsphere
+  type: pcf-pool
+jobs:
+- name: claim-2.9-env
+  plan:
+  - get: azure-nozzle
+    trigger: true
+  - put: 2.9-env
+    tags:
+    - cf-denver-shared-vsphere
+    params:
+      action: claim
+
+- name: build-and-test-nozzle
+  plan:
+  - get: azure-nozzle
+    passed:
+    - claim-2.9-env
+  - get: 2.9-env
+    trigger: true
+    passed:
+    - claim-2.9-env
+    tags:
+    - cf-denver-shared-vsphere
+  - task: build-tile
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: logcache/azure-ci }
+      inputs:
+        - name: azure-nozzle
+      outputs:
+        - name: azure-nozzle-tile
+      run:
+        path: /bin/bash
+        args:
+        - -c
+        - |
+          workspace=$PWD
+          pushd azure-nozzle/pcf-tile
+            ./generate-tile.sh | grep -E ^version | awk '{print $2}' > ${workspace}/azure-nozzle-tile/version
+            mv product/azure-log-analytics-* ${workspace}/azure-nozzle-tile/azure-nozzle
+          popd
+
+  - task: upload-and-install-tile
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: logcache/azure-ci }
+      inputs:
+        - name: 2.9-env
+        - name: azure-nozzle-tile
+      params:
+        AZURE_ID: ((azure-workspace-id))
+        AZURE_KEY: ((azure-workspace-key))
+      run:
+        path: /bin/bash
+        args:
+        - -c
+        - |
+          CF_ADMIN_PASSWORD=$(om -e 2.9-env/pcf.yml credentials --product-name cf --credential-reference .uaa.admin_credentials | grep "admin" | awk '{ print $4 }')
+          AZ=$(cat 2.9-env/metadata | jq .azs[0] -r)
+          NETWORK=$(cat 2.9-env/metadata | jq .ert_subnet)
+
+          cat <<EOF >> azure.yml
+          product-name: azure-log-analytics-nozzle
+          product-properties:
+            .properties.firehose_user_password:
+              value:
+                secret: $CF_ADMIN_PASSWORD
+            .properties.firehose_user:
+              value: admin
+            .properties.log_level:
+              value: DEBUG
+            .properties.oms_workspace:
+              value: $AZURE_ID
+            .properties.oms_key:
+              value:
+                secret: $AZURE_KEY
+          network-properties:
+            network:
+              name: $NETWORK
+            other_availability_zones:
+            - name: $AZ
+            singleton_availability_zone:
+              name: $AZ
+          EOF
+
+          om -e 2.9-env/pcf.yml upload-product --product azure-nozzle-tile/azure-nozzle
+          om -e 2.9-env/pcf.yml stage-product \
+            --product-name azure-log-analytics-nozzle \
+            --product-version $(cat azure-nozzle-tile/version)
+
+          om -e 2.9-env/pcf.yml configure-product \
+            --config azure.yml
+
+          om -e 2.9-env/pcf.yml apply-changes \
+            --product-name azure-log-analytics-nozzle
+
+  - task: test-nozzle
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: logcache/azure-ci }
+      inputs:
+        - name: 2.9-env
+      params:
+        AZURE_USER: ((azure-login-username))
+        AZURE_PASSWORD: ((azure-login-password))
+        AZURE_TENANT: ((azure-login-tenant))
+      run:
+        path: /bin/bash
+        args:
+        - -c
+        - |
+          az login \
+            --service-principal \
+            -u ${AZURE_USER} \
+            -p ${AZURE_PASSWORD} \
+            --tenant ${AZURE_TENANT}
+
+          CF_NAME=$(om -e 2.9-env/pcf.yml deployed-manifest -p cf | grep -E "^name: cf-" | awk '{print $2}')
+          RECENT_LOG_COUNT=$(az monitor log-analytics query -w 502080d7-6735-4e03-862c-a8397e636fa2 --analytics-query "CF_LogMessage_CL | where TimeGenerated > ago(5m) | where Deployment_s == \"${CF_NAME}\"" -t P3DT12H | jq '. | length')
+          echo "Got ${RECENT_LOG_COUNT} for ${CF_NAME}"
+
+          if (( ${RECENT_LOG_COUNT} > 0 )); then
+            exit 0
+          fi
+          exit 1
