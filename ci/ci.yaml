@@ -20,9 +20,33 @@ resources:
   - cf-denver-shared-vsphere
   type: pcf-pool
 jobs:
+- name: azure-unit-tests
+  plan:
+  - get: azure-nozzle
+    trigger: true
+  - task: unit tests
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: golang
+      inputs:
+      - name: azure-nozzle
+      run:
+        path: /bin/bash
+        args:
+        - -c
+        - |
+          set -eo pipefail
+          cd azure-nozzle
+          go test ./...
+
 - name: claim-2.9-env
   plan:
   - get: azure-nozzle
+    passed:
+    - azure-unit-tests
     trigger: true
   - put: 2.9-env
     tags:
@@ -56,6 +80,7 @@ jobs:
         args:
         - -c
         - |
+          set -eo pipefail
           workspace=$PWD
           pushd azure-nozzle/pcf-tile
             ./generate-tile.sh | grep -E ^version | awk '{print $2}' > ${workspace}/azure-nozzle-tile/version
@@ -79,6 +104,7 @@ jobs:
         args:
         - -c
         - |
+          set -eo pipefail
           CF_ADMIN_PASSWORD=$(om -e 2.9-env/pcf.yml credentials --product-name cf --credential-reference .uaa.admin_credentials | grep "admin" | awk '{ print $4 }')
           AZ=$(cat 2.9-env/metadata | jq .azs[0] -r)
           NETWORK=$(cat 2.9-env/metadata | jq .ert_subnet)
@@ -135,6 +161,7 @@ jobs:
         args:
         - -c
         - |
+          set -eo pipefail
           az login \
             --service-principal \
             -u ${AZURE_USER} \
