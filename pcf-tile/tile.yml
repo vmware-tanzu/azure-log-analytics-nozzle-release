@@ -62,7 +62,7 @@ stemcell_criteria:
 # applications as environment variables. You can also refer to them
 # elsewhere in this template by using:
 #     (( .properties.<property-name> ))
-# 
+#
 forms:
  - name: nozzle-config-form
    label: Nozzle Config
@@ -130,14 +130,21 @@ forms:
      description: Label to identify logs and metrics from different CF environments
      default: "cf"
    - name: skip_ssl_validation
-     type: boolean 
+     type: boolean
      label: Skip SSL Validation
      default: false
-   - name: event_filter
-     type: string
-     label: Event Types to be Filtered out
-     description: A comma separated list of event types to be dropped. Valid types are METRIC,LOG,HTTP
+   - name: envelope_filter
+     type: multi_select_options
+     label: Envelope Types to be Filtered out
      optional: true
+     description: A comma separated list of envelope types to be dropped.
+     options:
+     - name: METRIC
+       label: "metric"
+     - name: LOG
+       label: "log"
+     - name: HTTP
+       label: "http"
    - name: space_whitelist
      type: string
      label: App Space Whitelist
@@ -169,7 +176,7 @@ forms:
        label: Info
      - name: ERROR
        label: Error
-     
+
 # Add any dependencies your tile has on other installed products.
 # This is often appropriate when using automatic service provisioning
 # for any of your packages above, with services provided by other
@@ -194,3 +201,24 @@ forms:
 #
 migration: |
   properties['properties']['.properties.org']['value'] = 'system';
+
+  if (properties['properties']['.properties.event_filter'] == null ||
+      properties['properties']['.properties.event_filter']['value'] == null)
+  {
+    return properties
+  }
+
+  let filters = []
+  let eventFilters = properties['properties']['.properties.event_filter']['value'].toUpperCase()
+  if (eventFilters.includes("LOG")) {
+    filters.push("LOG")
+  }
+  if (eventFilters.includes("METRIC")) {
+    filters.push("METRIC")
+  }
+  if (eventFilters.includes("HTTP")) {
+    filters.push("HTTP")
+  }
+  delete properties['properties']['.properties.event_filter'];
+  properties['properties']['.properties.envelope_filter'] = { "value": filters }
+

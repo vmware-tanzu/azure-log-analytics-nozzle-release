@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/lager"
+	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/caching"
 	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/client"
 	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/firehose"
 	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/omsnozzle"
-	"github.com/cloudfoundry-community/go-cfclient"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -54,7 +54,7 @@ var (
 
 	// comma separated list of types to exclude.  For now use metric,log,http and revisit later
 	spaceFilter           = kingpin.Flag("appFilter", "Comma separated white list of orgs/spaces/apps").Default("").OverrideDefaultFromEnvar("SPACE_WHITELIST").String()
-	eventFilter           = kingpin.Flag("eventFilter", "Comma separated list of types to exclude").Default("").OverrideDefaultFromEnvar("EVENT_FILTER").String()
+	envelopeFilter        = kingpin.Flag("envelopeFilter", "Comma separated list of types to exclude").Default("").OverrideDefaultFromEnvar("ENVELOPE_FILTER").String()
 	skipSslValidation     = kingpin.Flag("skip-ssl-validation", "Skip SSL validation").Default("false").OverrideDefaultFromEnvar("SKIP_SSL_VALIDATION").Bool()
 	idleTimeout           = kingpin.Flag("idle-timeout", "Keep Alive duration for the firehose consumer").Default("25s").OverrideDefaultFromEnvar("IDLE_TIMEOUT").Duration()
 	logLevel              = kingpin.Flag("log-level", "Log level: DEBUG, INFO, ERROR").Default("INFO").OverrideDefaultFromEnvar("LOG_LEVEL").String()
@@ -133,24 +133,24 @@ func main() {
 	}
 	logger.Info("config", lager.Data{"LOG_EVENT_COUNT": *logEventCount})
 	logger.Info("config", lager.Data{"LOG_EVENT_COUNT_INTERVAL": (*logEventCountInterval).String()})
-	if len(*eventFilter) > 0 {
-		*eventFilter = strings.ToUpper(*eventFilter)
+	if len(*envelopeFilter) > 0 {
+		*envelopeFilter = strings.ToUpper(*envelopeFilter)
 		// by default we don't filter any events
-		if strings.Contains(*eventFilter, metricEventType) {
+		if strings.Contains(*envelopeFilter, metricEventType) {
 			excludeMetricEvents = true
 		}
-		if strings.Contains(*eventFilter, logEventType) {
+		if strings.Contains(*envelopeFilter, logEventType) {
 			excludeLogEvents = true
 		}
-		if strings.Contains(*eventFilter, httpEventType) {
+		if strings.Contains(*envelopeFilter, httpEventType) {
 			excludeHttpEvents = true
 		}
-		logger.Info("config", lager.Data{"EVENT_FILTER": *eventFilter},
+		logger.Info("config", lager.Data{"ENVELOPE_FILTER": *envelopeFilter},
 			lager.Data{"excludeMetricEvents": excludeMetricEvents},
 			lager.Data{"excludeLogEvents": excludeLogEvents},
 			lager.Data{"excludeHTTPEvents": excludeHttpEvents})
 	} else {
-		logger.Info("config EVENT_FILTER is nil. all events will be published")
+		logger.Info("config ENVELOPE_FILTER is nil. all events will be published")
 	}
 
 	cfClientConfig := &cfclient.Config{
