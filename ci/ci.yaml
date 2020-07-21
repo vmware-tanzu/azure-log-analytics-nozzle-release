@@ -176,3 +176,18 @@ jobs:
             exit 0
           fi
           exit 1
+
+- name: unclaim-2.9-env
+  plan:
+  - get: 2.9-env
+    tags:
+    - cf-denver-shared-vsphere
+    passed:
+    - build-and-test-nozzle
+    trigger: true
+  - put: 2.9-env
+    tags:
+    - cf-denver-shared-vsphere
+    params:
+      action: unclaim
+      env_file: 2.9-env/metadata
