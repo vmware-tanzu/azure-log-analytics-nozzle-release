@@ -4,7 +4,17 @@ resource_types:
   source:
     repository: cftoolsmiths/toolsmiths-envs-resource
   type: docker-image
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
 resources:
+- name: azure-nozzle-pivnet
+  type: pivnet
+  source:
+    api_token: ((pivnet-api-token))
+    product_slug: azure-nozzle
 - name: azure-nozzle
   type: git
   source:
@@ -178,6 +188,63 @@ jobs:
             exit 0
           fi
           exit 1
+
+- name: build-and-upload-tile
+  plan:
+  - get: azure-nozzle
+    trigger: true
+    passed:
+    - build-and-test-nozzle
+  - task: build-tile
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: logcache/azure-ci }
+      inputs:
+        - name: azure-nozzle
+      outputs:
+        - name: azure-nozzle-tile
+      run:
+        path: /bin/bash
+        args:
+        - -c
+        - |
+          set -eo pipefail
+          workspace=$PWD
+          pushd azure-nozzle/pcf-tile
+            ./generate-tile.sh | grep -E ^version | awk '{print $2}' > ${workspace}/azure-nozzle-tile/version
+            mv product/azure-log-analytics-* ${workspace}/azure-nozzle-tile/azure-nozzle
+          popd
+
+  - task: make-metadata
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: logcache/azure-ci }
+      outputs:
+      - name: metadata
+      run:
+        path: /bin/bash
+        args:
+        - -c
+        - |
+          set -eo pipefail
+
+          cat << EOF > metadata/metadata.yml
+          ---
+          release:
+            version: "dev"
+            release_type: "Developer Release"
+            eula_slug: "vmware_eula"
+          EOF
+
+  - put: azure-nozzle-pivnet
+    params:
+      file_glob: azure-nozzle-tile/azure-nozzle
+      metadata_file: metadata/metadata.yml
+      override: true
 
 - name: unclaim-2.9-env
   plan:
