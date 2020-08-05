@@ -4,7 +4,7 @@
 #
 name: azure-log-analytics-nozzle # By convention lowercase with dashes
 icon_file: resources/icon.png
-label: Microsoft Azure Log Analytics Nozzle
+label: VMware Tanzu Nozzle for Microsoft Azure Log Analytics
 description: A nozzle which forwards metrics and logs from the Loggregator Firehose to OMS (Operations Management Suite) Log Analytics
 # metadata_version: 1.8                 # Optional, defaults to 1.5
 
