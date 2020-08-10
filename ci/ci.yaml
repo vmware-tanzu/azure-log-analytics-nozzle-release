@@ -214,7 +214,7 @@ jobs:
           workspace=$PWD
           pushd azure-nozzle/pcf-tile
             ./generate-tile.sh | grep -E ^version | awk '{print $2}' > ${workspace}/azure-nozzle-tile/version
-            mv product/azure-log-analytics-* ${workspace}/azure-nozzle-tile/azure-nozzle.pivotal
+            mv product/azure-log-analytics-* ${workspace}/azure-nozzle-tile/azure-nozzle-$(date +%s).pivotal
           popd
 
   - task: make-metadata
@@ -242,7 +242,7 @@ jobs:
 
   - put: azure-nozzle-pivnet
     params:
-      file_glob: azure-nozzle-tile/azure-nozzle.pivotal
+      file_glob: azure-nozzle-tile/azure-nozzle-*
       metadata_file: metadata/metadata.yml
       override: true
 
