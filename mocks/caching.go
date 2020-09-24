@@ -1,3 +1,6 @@
+// Copyright 2020 VMware, Inc.
+// SPDX-License-Identifier: Apache-2.0
+
 package mocks
 
 import "github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/caching"
