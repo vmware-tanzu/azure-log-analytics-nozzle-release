@@ -1,4 +1,4 @@
-module github.com/pivotal/azure-oms-log-analytics-firehose-nozzle
+module github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics
 
 go 1.14
 

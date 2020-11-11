@@ -8,13 +8,13 @@ import (
 	hex "encoding/hex"
 	"time"
 
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/caching"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/caching"
 
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/messages"
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/mocks"
 	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/messages"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/mocks"
 )
 
 var _ = Describe("Messages", func() {

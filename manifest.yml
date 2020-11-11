@@ -7,7 +7,7 @@ applications:
   no-route: true
   health-check-type: none
   env:
-    GOPACKAGENAME: github.com/pivotal/azure-oms-log-analytics-firehose-nozzle
+    GOPACKAGENAME: github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics
     OMS_WORKSPACE: CHANGE_ME
     OMS_KEY: CHANGE_ME
     OMS_POST_TIMEOUT: 10s

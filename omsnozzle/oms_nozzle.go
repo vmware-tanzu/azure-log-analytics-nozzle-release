@@ -13,11 +13,11 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/lager"
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/caching"
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/client"
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/firehose"
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/messages"
 	"github.com/cloudfoundry/sonde-go/events"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/caching"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/client"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/firehose"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/messages"
 )
 
 type OmsNozzle struct {

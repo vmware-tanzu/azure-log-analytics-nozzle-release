@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/lager"
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/mocks"
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/omsnozzle"
 	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/mocks"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/omsnozzle"
 )
 
 var (

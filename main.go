@@ -15,10 +15,10 @@ import (
 
 	"code.cloudfoundry.org/lager"
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/caching"
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/client"
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/firehose"
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/omsnozzle"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/caching"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/client"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/firehose"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/omsnozzle"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 

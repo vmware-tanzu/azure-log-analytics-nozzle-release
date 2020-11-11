@@ -18,8 +18,8 @@ resources:
 - name: azure-nozzle
   type: git
   source:
-    uri: git@github.com:pivotal/azure-oms-log-analytics-firehose-nozzle.git
-    branch: master
+    uri: git@github.com:vmware-tanzu/nozzle-for-microsoft-azure-log-analytics.git
+    branch: main
     private_key: ((oratos-key))
     ignore_paths:
     - ci/

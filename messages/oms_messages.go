@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pivotal/azure-oms-log-analytics-firehose-nozzle/caching"
 	events "github.com/cloudfoundry/sonde-go/events"
+	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/caching"
 )
 
 // BaseMessage contains common data elements
