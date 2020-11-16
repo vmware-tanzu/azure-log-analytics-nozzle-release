@@ -5,8 +5,6 @@ get things working in your environment. There are a few guidelines that we
 need contributors to follow so that we can have a chance of keeping on
 top of things.
 
-<!-- TODO: add slack info once we determine the best channel going forward-->
-
 ## Getting Started
 
 * Make sure you have a [GitHub account](https://github.com/join).
@@ -29,7 +27,6 @@ top of things.
 
 ## Submitting Changes
 
-* Sign the Contributor License Agreement. <!-- TODO: add link to this -->
 * Push your changes to a topic branch in your fork of the repository.
 * Submit a pull request to this repository.
 * Link pull request to your GitHub issue.
