@@ -1,0 +1,16 @@
+ definitions:
+  - name: "lager"
+    prefix: "code.cloudfoundry.org/lager"
+    regex: 'code\.cloudfoundry\.org\/lager\|(?P<version>.*)$'
+    url_template: 'https://codeload.github.com/cloudfoundry/lager/tar.gz/${version}'
+    file_template: 'go_lager-${version}.tar.gz'
+  - name: "gofileutils"
+    prefix: "code.cloudfoundry.org/gofileutils"
+    regex: 'code\.cloudfoundry\.org\/gofileutils\|(?P<version>.*)$'
+    url_template: 'https://codeload.github.com/cloudfoundry/gofileutils/tar.gz/${version}'
+    file_template: 'go_gofileutils-${version}.tar.gz'
+  - name: "protobuf"
+    prefix: "google.golang.org/protobuf"
+    regex: 'google\.golang\.org\/protobuf\|(?P<version>.*)$'
+    url_template: 'https://codeload.github.com/protocolbuffers/protobuf-go/tar.gz/${version}'
+    file_template: 'go_protobuf-go-${version}.tar.gz'
