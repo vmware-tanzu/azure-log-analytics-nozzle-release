@@ -1,6 +1,3 @@
-# Checkout to shas version used in pks. You can find release version in p-pks-integrations
-# use sink-resources release to find the version of the images which should be the same
-# as the git shas of the repo
 BASE_DIR="$(cd $(dirname $0)/.. && pwd -P)"
 OSSTP_LOAD=${OSSTP_LOAD:-~/workspace/osstpclients/bin/osstp-load.py}
 OSM_API_KEY_FILE=${OSM_API_KEY_FILE:-~/.osmapikey}
