@@ -38,8 +38,6 @@ const (
 	httpEventType = "HTTP"
 	// the prefix of message type in OMS Log Analytics
 	omsTypePrefix = "CF_"
-
-	version = "1.1.2"
 )
 
 // Required parameters
@@ -70,7 +68,6 @@ var (
 )
 
 func main() {
-	kingpin.Version(version)
 	kingpin.Parse()
 
 	logger := lager.NewLogger("oms-nozzle")
