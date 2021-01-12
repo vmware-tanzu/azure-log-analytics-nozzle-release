@@ -29,7 +29,7 @@ resources:
     hostname: environments.toolsmiths.cf-app.com
     pool_name: us_2_9
   tags:
-  - cf-denver-shared-vsphere
+  - vsphere-nimbus
   type: pcf-pool
 jobs:
 - name: azure-unit-tests
@@ -62,7 +62,7 @@ jobs:
     trigger: true
   - put: 2.9-env
     tags:
-    - cf-denver-shared-vsphere
+    - vsphere-nimbus
     params:
       action: claim
 
@@ -76,7 +76,7 @@ jobs:
     passed:
     - claim-2.9-env
     tags:
-    - cf-denver-shared-vsphere
+    - vsphere-nimbus
   - task: build-tile
     config:
       platform: linux
@@ -250,13 +250,13 @@ jobs:
   plan:
   - get: 2.9-env
     tags:
-    - cf-denver-shared-vsphere
+    - vsphere-nimbus
     passed:
     - build-and-test-nozzle
     trigger: true
   - put: 2.9-env
     tags:
-    - cf-denver-shared-vsphere
+    - vsphere-nimbus
     params:
       action: unclaim
       env_file: 2.9-env/metadata
