@@ -25,3 +25,4 @@ applications:
     LOG_LEVEL: INFO # Valid log levels: DEBUG, INFO, ERROR
     LOG_EVENT_COUNT: true
     LOG_EVENT_COUNT_INTERVAL: 60s
+    CACHING_INTERVAL: 60s

@@ -165,6 +165,11 @@ forms:
      label: Log Event Count Interval
      description: The time interval to log event count
      default: 60s
+   - name: caching_interval
+     type: string
+     label: App Info Caching Interval
+     description: How long to cache app names and other metadata
+     default: 60s
    - name: log_level
      type: dropdown_select
      label: Log Level

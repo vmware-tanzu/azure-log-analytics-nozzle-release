@@ -61,6 +61,7 @@ var (
 	logLevel              = kingpin.Flag("log-level", "Log level: DEBUG, INFO, ERROR").Default("INFO").OverrideDefaultFromEnvar("LOG_LEVEL").String()
 	logEventCount         = kingpin.Flag("log-event-count", "Whether to log the total count of received and sent events to OMS").Default("false").OverrideDefaultFromEnvar("LOG_EVENT_COUNT").Bool()
 	logEventCountInterval = kingpin.Flag("log-event-count-interval", "The interval to log the total count of received and sent events to OMS").Default("60s").OverrideDefaultFromEnvar("LOG_EVENT_COUNT_INTERVAL").Duration()
+	cachingInterval       = kingpin.Flag("caching-interval", "The interval to keep app name cached for").Default("61s").OverrideDefaultFromEnvar("CACHING_INTERVAL").Duration()
 
 	excludeMetricEvents = false
 	excludeLogEvents    = false
@@ -181,7 +182,7 @@ func main() {
 		LogEventCountInterval: *logEventCountInterval,
 	}
 
-	cachingClient := caching.NewCaching(cfClientConfig, logger, *environment, *spaceFilter)
+	cachingClient := caching.NewCaching(cfClientConfig, logger, *environment, *spaceFilter, cachingInterval)
 	nozzle := omsnozzle.NewOmsNozzle(logger, firehoseClient, omsClient, nozzleConfig, cachingClient)
 
 	nozzle.Start()
