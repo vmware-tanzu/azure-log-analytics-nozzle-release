@@ -182,7 +182,7 @@ func main() {
 		LogEventCountInterval: *logEventCountInterval,
 	}
 
-	cachingClient := caching.NewCaching(cfClientConfig, logger, *environment, *spaceFilter, cachingInterval)
+	cachingClient := caching.NewCaching(cfClientConfig, logger, *environment, *spaceFilter, *cachingInterval)
 	nozzle := omsnozzle.NewOmsNozzle(logger, firehoseClient, omsClient, nozzleConfig, cachingClient)
 
 	nozzle.Start()
