@@ -8,28 +8,31 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"code.cloudfoundry.org/lager"
 	cfclient "github.com/cloudfoundry-community/go-cfclient"
 )
 
 type AppInfo struct {
-	Name      string `json:"name"`
-	Org       string `json:"org"`
-	OrgID     string `json:"orgId"`
-	Space     string `json:"space"`
-	SpaceID   string `json:"spaceId"`
-	Monitored bool   `json:"monitored"`
+	Name        string `json:"name"`
+	Org         string `json:"org"`
+	OrgID       string `json:"orgId"`
+	Space       string `json:"space"`
+	SpaceID     string `json:"spaceId"`
+	LastFetched time.Time
+	Monitored   bool `json:"monitored"`
 }
 
 type Caching struct {
-	cfClientConfig *cfclient.Config
-	appInfosByGuid map[string]AppInfo
-	spaceWhiteList map[string]bool
-	appInfoLock    sync.RWMutex
-	logger         lager.Logger
-	instanceName   string
-	environment    string
+	cfClientConfig  *cfclient.Config
+	appInfosByGuid  map[string]AppInfo
+	spaceWhiteList  map[string]bool
+	appInfoLock     sync.RWMutex
+	logger          lager.Logger
+	instanceName    string
+	environment     string
+	cachingInterval time.Duration
 }
 
 type CachingClient interface {
@@ -39,7 +42,7 @@ type CachingClient interface {
 	Initialize(bool)
 }
 
-func NewCaching(config *cfclient.Config, logger lager.Logger, environment string, spaceFilter string) CachingClient {
+func NewCaching(config *cfclient.Config, logger lager.Logger, environment string, spaceFilter string, cachingInterval time.Duration) CachingClient {
 	var spaceWhiteList map[string]bool
 	if len(spaceFilter) > 0 {
 		logger.Info("config", lager.Data{"SPACE_FILTER": spaceFilter})
@@ -54,21 +57,23 @@ func NewCaching(config *cfclient.Config, logger lager.Logger, environment string
 		logger.Info("config SPACE_FILTER is nil, all apps will be monitored")
 	}
 	return &Caching{
-		cfClientConfig: config,
-		appInfosByGuid: make(map[string]AppInfo),
-		spaceWhiteList: spaceWhiteList,
-		logger:         logger,
-		environment:    environment,
+		cfClientConfig:  config,
+		appInfosByGuid:  make(map[string]AppInfo),
+		spaceWhiteList:  spaceWhiteList,
+		logger:          logger,
+		environment:     environment,
+		cachingInterval: cachingInterval,
 	}
 }
 
 func (c *Caching) addAppinfoRecord(app cfclient.App) {
 	var appInfo = AppInfo{
-		Name:    app.Name,
-		Org:     app.SpaceData.Entity.OrgData.Entity.Name,
-		OrgID:   app.SpaceData.Entity.OrgData.Entity.Guid,
-		Space:   app.SpaceData.Entity.Name,
-		SpaceID: app.SpaceData.Entity.Guid,
+		Name:        app.Name,
+		Org:         app.SpaceData.Entity.OrgData.Entity.Name,
+		OrgID:       app.SpaceData.Entity.OrgData.Entity.Guid,
+		Space:       app.SpaceData.Entity.Name,
+		SpaceID:     app.SpaceData.Entity.Guid,
+		LastFetched: time.Now(),
 	}
 	if c.spaceWhiteList == nil ||
 		c.spaceWhiteList[app.SpaceData.Entity.OrgData.Entity.Name] ||
@@ -118,16 +123,22 @@ func (c *Caching) Initialize(loadApps bool) {
 func (c *Caching) GetAppInfo(appGuid string) AppInfo {
 	var appInfo AppInfo
 	var ok bool
+	var old bool
 	func() {
 		c.appInfoLock.RLock()
 		defer c.appInfoLock.RUnlock()
 		appInfo, ok = c.appInfosByGuid[appGuid]
+		if ok && time.Now().Sub(appInfo.LastFetched) < c.cachingInterval {
+			old = true
+		}
 	}()
-	if ok {
+	if ok && !old {
 		return appInfo
 	} else {
-		c.logger.Info("App info not found for GUID",
-			lager.Data{"guid": appGuid})
+		if !ok {
+			c.logger.Info("App info not found for GUID",
+				lager.Data{"guid": appGuid})
+		}
 		// call the client api to get the name for this app
 		// purposely create a new client due to issue in using a single client
 		cfClient, err := cfclient.NewClient(c.cfClientConfig)
