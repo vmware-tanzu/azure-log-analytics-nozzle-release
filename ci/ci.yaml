@@ -23,11 +23,11 @@ resources:
     private_key: ((oratos-key))
     ignore_paths:
     - ci/
-- name: 2.9-env
+- name: 2.7-env
   source:
     api_token: ((toolsmith-api-key))
     hostname: environments.toolsmiths.cf-app.com
-    pool_name: us_2_9
+    pool_name: us_2_7_lts
   tags:
   - vsphere-nimbus
   type: pcf-pool
@@ -54,13 +54,13 @@ jobs:
           cd azure-nozzle
           go test ./...
 
-- name: claim-2.9-env
+- name: claim-2.7-env
   plan:
   - get: azure-nozzle
     passed:
     - azure-unit-tests
     trigger: true
-  - put: 2.9-env
+  - put: 2.7-env
     tags:
     - vsphere-nimbus
     params:
@@ -70,11 +70,11 @@ jobs:
   plan:
   - get: azure-nozzle
     passed:
-    - claim-2.9-env
-  - get: 2.9-env
+    - claim-2.7-env
+  - get: 2.7-env
     trigger: true
     passed:
-    - claim-2.9-env
+    - claim-2.7-env
     tags:
     - vsphere-nimbus
   - task: build-tile
@@ -106,7 +106,7 @@ jobs:
         type: registry-image
         source: { repository: logcache/azure-ci }
       inputs:
-        - name: 2.9-env
+        - name: 2.7-env
         - name: azure-nozzle-tile
       params:
         AZURE_ID: ((azure-workspace-id))
@@ -117,9 +117,9 @@ jobs:
         - -c
         - |
           set -eo pipefail
-          CF_ADMIN_PASSWORD=$(om -e 2.9-env/pcf.yml credentials --product-name cf --credential-reference .uaa.admin_credentials | grep "admin" | awk '{ print $4 }')
-          AZ=$(cat 2.9-env/metadata | jq .azs[0] -r)
-          NETWORK=$(cat 2.9-env/metadata | jq .ert_subnet)
+          CF_ADMIN_PASSWORD=$(om -e 2.7-env/pcf.yml credentials --product-name cf --credential-reference .uaa.admin_credentials | grep "admin" | awk '{ print $4 }')
+          AZ=$(cat 2.7-env/metadata | jq .azs[0] -r)
+          NETWORK=$(cat 2.7-env/metadata | jq .ert_subnet)
 
           cat <<EOF >> azure.yml
           product-name: azure-log-analytics-nozzle
@@ -145,15 +145,15 @@ jobs:
               name: $AZ
           EOF
 
-          om -e 2.9-env/pcf.yml upload-product --product azure-nozzle-tile/azure-nozzle
-          om -e 2.9-env/pcf.yml stage-product \
+          om -e 2.7-env/pcf.yml upload-product --product azure-nozzle-tile/azure-nozzle
+          om -e 2.7-env/pcf.yml stage-product \
             --product-name azure-log-analytics-nozzle \
             --product-version $(cat azure-nozzle-tile/version)
 
-          om -e 2.9-env/pcf.yml configure-product \
+          om -e 2.7-env/pcf.yml configure-product \
             --config azure.yml
 
-          om -e 2.9-env/pcf.yml apply-changes \
+          om -e 2.7-env/pcf.yml apply-changes \
             --product-name azure-log-analytics-nozzle
 
   - task: test-nozzle
@@ -163,7 +163,7 @@ jobs:
         type: registry-image
         source: { repository: logcache/azure-ci }
       inputs:
-        - name: 2.9-env
+        - name: 2.7-env
       params:
         AZURE_USER: ((azure-login-username))
         AZURE_PASSWORD: ((azure-login-password))
@@ -180,7 +180,7 @@ jobs:
             -p ${AZURE_PASSWORD} \
             --tenant ${AZURE_TENANT}
 
-          CF_NAME=$(om -e 2.9-env/pcf.yml deployed-manifest -p cf | grep -E "^name: cf-" | awk '{print $2}')
+          CF_NAME=$(om -e 2.7-env/pcf.yml deployed-manifest -p cf | grep -E "^name: cf-" | awk '{print $2}')
           RECENT_LOG_COUNT=$(az monitor log-analytics query -w 502080d7-6735-4e03-862c-a8397e636fa2 --analytics-query "CF_LogMessage_CL | where TimeGenerated > ago(5m) | where Deployment_s == \"${CF_NAME}\"" -t P3DT12H | jq '. | length')
           echo "Got ${RECENT_LOG_COUNT} for ${CF_NAME}"
 
@@ -246,17 +246,17 @@ jobs:
       metadata_file: metadata/metadata.yml
       override: true
 
-- name: unclaim-2.9-env
+- name: unclaim-2.7-env
   plan:
-  - get: 2.9-env
+  - get: 2.7-env
     tags:
     - vsphere-nimbus
     passed:
     - build-and-test-nozzle
     trigger: true
-  - put: 2.9-env
+  - put: 2.7-env
     tags:
     - vsphere-nimbus
     params:
       action: unclaim
-      env_file: 2.9-env/metadata
+      env_file: 2.7-env/metadata

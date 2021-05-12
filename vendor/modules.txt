@@ -91,8 +91,6 @@ github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
 # github.com/pkg/errors v0.8.1
 github.com/pkg/errors
-# github.com/poy/eachers v0.0.0-20181020210610-23942921fe77
-## explicit
 # github.com/stretchr/testify v1.6.0
 ## explicit
 # golang.org/x/net v0.0.0-20200520004742-59133d7f0dd7

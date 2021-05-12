@@ -17,7 +17,6 @@ require (
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/onsi/ginkgo v1.12.3
 	github.com/onsi/gomega v1.10.1
-	github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/stretchr/testify v1.6.0 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )
