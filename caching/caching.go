@@ -128,7 +128,7 @@ func (c *Caching) GetAppInfo(appGuid string) AppInfo {
 		c.appInfoLock.RLock()
 		defer c.appInfoLock.RUnlock()
 		appInfo, ok = c.appInfosByGuid[appGuid]
-		if ok && time.Now().Sub(appInfo.LastFetched) < c.cachingInterval {
+		if ok && time.Now().Sub(appInfo.LastFetched) >= c.cachingInterval {
 			old = true
 		}
 	}()
