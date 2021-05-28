@@ -23,12 +23,12 @@ type Client interface {
 
 // Client posts messages to OMS
 type client struct {
-	customerID       string
-	sharedKey        string
-	url              string
-	httpPostTimeout  time.Duration
-	logger           lager.Logger
-	omsCustomHeaders map[string]string
+	customerID      string
+	sharedKey       string
+	url             string
+	httpPostTimeout time.Duration
+	logger          lager.Logger
+	azureResourceId string
 }
 
 const (
@@ -42,14 +42,14 @@ func init() {
 }
 
 // New instance of the Client
-func NewOmsClient(customerID string, sharedKey string, postTimeout time.Duration, omsCustomHeaders map[string]string, logger lager.Logger) Client {
+func NewOmsClient(customerID string, sharedKey string, postTimeout time.Duration, azureResourceId string, logger lager.Logger) Client {
 	return &client{
-		customerID:       customerID,
-		sharedKey:        sharedKey,
-		url:              "https://" + customerID + ".ods.opinsights.azure.com" + resource + "?api-version=2016-04-01",
-		httpPostTimeout:  postTimeout,
-		logger:           logger,
-		omsCustomHeaders: omsCustomHeaders,
+		customerID:      customerID,
+		sharedKey:       sharedKey,
+		url:             "https://" + customerID + ".ods.opinsights.azure.com" + resource + "?api-version=2016-04-01",
+		httpPostTimeout: postTimeout,
+		logger:          logger,
+		azureResourceId: azureResourceId,
 	}
 }
 
@@ -77,10 +77,10 @@ func (c *client) PostData(msg *[]byte, logType string) error {
 	//TODO: headers should be case insentitive
 	//req.Header.Set("x-ms-date", rfc1123date)
 	req.Header["x-ms-date"] = []string{rfc1123date}
-	req.Header.Set("Content-Type", "application/json")
-	for key, value := range c.omsCustomHeaders {
-		req.Header[key] = []string{value}
+	if c.azureResourceId != "" {
+		req.Header["x-ms-AzureResourceId"] = []string{c.azureResourceId}
 	}
+	req.Header.Set("Content-Type", "application/json")
 
 	client := http.Client{
 		Timeout: c.httpPostTimeout,
