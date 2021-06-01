@@ -100,6 +100,11 @@ forms:
      constraints:
        min: 1
        max: 10000
+   - name: azure_resource_id
+     type: string
+     optional: true
+     label: Azure Resource Id
+     description: e.g. /subscriptions/<uuid>/resourceGroups/<name>/... . If set, the Resource Id will be attached to all the logs sent to Azure Monitor via this nozzle.
    - name: firehose_user
      type: string
      label: Firehose Username
