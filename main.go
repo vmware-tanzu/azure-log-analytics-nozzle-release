@@ -50,6 +50,7 @@ var (
 	omsWorkspace         = kingpin.Flag("oms-workspace", "OMS workspace ID").OverrideDefaultFromEnvar("OMS_WORKSPACE").Required().String()
 	omsKey               = kingpin.Flag("oms-key", "OMS workspace key").OverrideDefaultFromEnvar("OMS_KEY").Required().String()
 	omsPostTimeout       = kingpin.Flag("oms-post-timeout", "HTTP timeout for posting events to OMS Log Analytics").Default("5s").OverrideDefaultFromEnvar("OMS_POST_TIMEOUT").Duration()
+	azureResourceId      = kingpin.Flag("azure-resource-id", "Resource Id to include as an HTTP header when posting events").OverrideDefaultFromEnvar("AZURE_RESOURCE_ID").String()
 	omsBatchTime         = kingpin.Flag("oms-batch-time", "Interval to post an OMS batch").Default("5s").OverrideDefaultFromEnvar("OMS_BATCH_TIME").Duration()
 	omsMaxMsgNumPerBatch = kingpin.Flag("oms-max-msg-num-per-batch", "Max number of messages per OMS batch").Default("1000").OverrideDefaultFromEnvar("OMS_MAX_MSG_NUM_PER_BATCH").Int()
 
@@ -169,7 +170,7 @@ func main() {
 
 	firehoseClient := firehose.NewClient(cfClientConfig, firehoseConfig, logger)
 
-	omsClient := client.NewOmsClient(*omsWorkspace, *omsKey, *omsPostTimeout, logger)
+	omsClient := client.NewOmsClient(*omsWorkspace, *omsKey, *omsPostTimeout, *azureResourceId, logger)
 
 	nozzleConfig := &omsnozzle.NozzleConfig{
 		OmsTypePrefix:         omsTypePrefix,

@@ -100,6 +100,11 @@ forms:
      constraints:
        min: 1
        max: 10000
+   - name: azure_resource_id
+     type: string
+     optional: true
+     label: Azure Resource Id
+     description: e.g. /subscriptions/<uuid>/resourceGroups/<name>/... . Set a Resource Id to be included when posting events
    - name: firehose_user
      type: string
      label: Firehose Username
