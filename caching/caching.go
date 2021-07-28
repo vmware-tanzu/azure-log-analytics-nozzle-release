@@ -95,23 +95,23 @@ func (c *Caching) addAppinfoRecord(app cfclient.App) {
 	return
 }
 
-const retryMax = 5
-const timeBetweenRetries = time.Second * 1
+const retryMax = 20
+const timeBetweenRetries = time.Second * 3
 
-func (c *Caching) NewClientWithRetries() (*cfclient.Client, error) {
-	var cfClient *cfclient.Client
+func (c *Caching) ListAppsWithRetries(cfClient *cfclient.Client) ([]cfclient.App, error) {
+	var apps []cfclient.App
 	var err error
 
 	for i := 0; i < retryMax; i++ {
-		cfClient, err = cfclient.NewClient(c.cfClientConfig)
+		apps, err = cfClient.ListApps()
 		if err == nil {
 			break
 		}
-		c.logger.Error(fmt.Sprintf("Failed to create a new client on attempt: %d. Retrying.", i), err)
+		c.logger.Error(fmt.Sprintf("Failed to list apps on attempt: %d. Retrying.", i), err)
 		time.Sleep(timeBetweenRetries)
 	}
 
-	return cfClient, err
+	return apps, err
 }
 
 func (c *Caching) Initialize(loadApps bool) {
@@ -121,13 +121,13 @@ func (c *Caching) Initialize(loadApps bool) {
 		return
 	}
 
-	cfClient, err := c.NewClientWithRetries()
+	cfClient, err := cfclient.NewClient(c.cfClientConfig)
 
 	if err != nil {
 		c.logger.Fatal("error creating cfclient", err)
 	}
 
-	apps, err := cfClient.ListApps()
+	apps, err := c.ListAppsWithRetries(cfClient)
 	if err != nil {
 		c.logger.Fatal("error getting app list", err)
 	}
