@@ -95,6 +95,25 @@ func (c *Caching) addAppinfoRecord(app cfclient.App) {
 	return
 }
 
+const retryMax = 5
+const timeBetweenRetries = time.Second * 1
+
+func (c *Caching) NewClientWithRetries() (*cfclient.Client, error) {
+	var cfClient *cfclient.Client
+	var err error
+
+	for i := 0; i < retryMax; i++ {
+		cfClient, err = cfclient.NewClient(c.cfClientConfig)
+		if err == nil {
+			break
+		}
+		c.logger.Error(fmt.Sprintf("Failed to create a new client on attempt: %d. Retrying.", i), err)
+		time.Sleep(timeBetweenRetries)
+	}
+
+	return cfClient, err
+}
+
 func (c *Caching) Initialize(loadApps bool) {
 	c.setInstanceName()
 
@@ -102,7 +121,8 @@ func (c *Caching) Initialize(loadApps bool) {
 		return
 	}
 
-	cfClient, err := cfclient.NewClient(c.cfClientConfig)
+	cfClient, err := c.NewClientWithRetries()
+
 	if err != nil {
 		c.logger.Fatal("error creating cfclient", err)
 	}
