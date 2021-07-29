@@ -5,6 +5,7 @@ package omsnozzle
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/signal"
 	"strings"
@@ -74,12 +75,36 @@ func (o *OmsNozzle) Start() error {
 	// setup for termination signal from CF
 	signal.Notify(o.signalChan, syscall.SIGTERM, syscall.SIGINT)
 
-	o.msgChan, o.errChan = o.firehoseClient.Connect()
+	err := o.routeEventsWithRetries()
+	return err
+}
 
-	if o.nozzleConfig.LogEventCount {
-		o.logTotalEvents(o.nozzleConfig.LogEventCountInterval)
+const retryMax = 20
+const timeBetweenRetries = time.Second * 3
+
+func (o *OmsNozzle) routeEventsWithRetries() error {
+	var err error
+	for i := 0; i < retryMax; i++ {
+		o.msgChan, o.errChan = o.firehoseClient.Connect()
+
+		if o.nozzleConfig.LogEventCount && i == 0 {
+			o.logTotalEvents(o.nozzleConfig.LogEventCountInterval)
+		}
+
+		err = o.routeEvents()
+		if err == nil {
+			break
+		}
+
+		if i+1 < retryMax {
+			o.logger.Error(fmt.Sprintf("Failed to process events on attempt: %d. Retrying.", i), err)
+		} else {
+			o.logger.Error(fmt.Sprintf("Failed to process events on attempt: %d. Run out of retries. Exiting.", i), err)
+		}
+
+		time.Sleep(timeBetweenRetries)
 	}
-	err := o.routeEvents()
+
 	return err
 }
 

@@ -107,7 +107,13 @@ func (c *Caching) ListAppsWithRetries(cfClient *cfclient.Client) ([]cfclient.App
 		if err == nil {
 			break
 		}
-		c.logger.Error(fmt.Sprintf("Failed to list apps on attempt: %d. Retrying.", i), err)
+
+		if i+1 < retryMax {
+			c.logger.Error(fmt.Sprintf("Failed to list apps on attempt: %d. Retrying.", i), err)
+		} else {
+			c.logger.Error(fmt.Sprintf("Failed to list apps on attempt: %d. Run out of retries. Exiting.", i), err)
+		}
+
 		time.Sleep(timeBetweenRetries)
 	}
 
