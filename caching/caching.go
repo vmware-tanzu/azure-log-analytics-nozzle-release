@@ -95,8 +95,8 @@ func (c *Caching) addAppinfoRecord(app cfclient.App) {
 	return
 }
 
-const retryMax = 20
-const timeBetweenRetries = time.Second * 3
+const retryMax = 200
+const timeBetweenRetries = time.Millisecond * 500
 
 func (c *Caching) ListAppsWithRetries(cfClient *cfclient.Client) ([]cfclient.App, error) {
 	var apps []cfclient.App

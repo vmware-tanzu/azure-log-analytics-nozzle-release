@@ -79,8 +79,8 @@ func (o *OmsNozzle) Start() error {
 	return err
 }
 
-const retryMax = 20
-const timeBetweenRetries = time.Second * 3
+const retryMax = 200
+const timeBetweenRetries = time.Millisecond * 500
 
 func (o *OmsNozzle) routeEventsWithRetries() error {
 	var err error
