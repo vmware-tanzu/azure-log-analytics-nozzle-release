@@ -58,6 +58,7 @@ var (
 	spaceFilter           = kingpin.Flag("appFilter", "Comma separated white list of orgs/spaces/apps").Default("").OverrideDefaultFromEnvar("SPACE_WHITELIST").String()
 	envelopeFilter        = kingpin.Flag("envelopeFilter", "Comma separated list of types to exclude").Default("").OverrideDefaultFromEnvar("ENVELOPE_FILTER").String()
 	skipSslValidation     = kingpin.Flag("skip-ssl-validation", "Skip SSL validation").Default("false").OverrideDefaultFromEnvar("SKIP_SSL_VALIDATION").Bool()
+	initializeCache       = kingpin.Flag("initialize-cache", "Initialize the cache on startup").Default("false").OverrideDefaultFromEnvar("INITIALIZE_CACHE").Bool()
 	idleTimeout           = kingpin.Flag("idle-timeout", "Keep Alive duration for the firehose consumer").Default("25s").OverrideDefaultFromEnvar("IDLE_TIMEOUT").Duration()
 	logLevel              = kingpin.Flag("log-level", "Log level: DEBUG, INFO, ERROR").Default("INFO").OverrideDefaultFromEnvar("LOG_LEVEL").String()
 	logEventCount         = kingpin.Flag("log-event-count", "Whether to log the total count of received and sent events to OMS").Default("false").OverrideDefaultFromEnvar("LOG_EVENT_COUNT").Bool()
@@ -121,6 +122,7 @@ func main() {
 		*omsPostTimeout = time.Duration(5) * time.Second
 	}
 	logger.Info("config", lager.Data{"SKIP_SSL_VALIDATION": *skipSslValidation})
+	logger.Info("config", lager.Data{"INITIALIZE_CACHE": *initializeCache})
 	logger.Info("config", lager.Data{"IDLE_TIMEOUT": (*idleTimeout).String()})
 	logger.Info("config", lager.Data{"OMS_BATCH_TIME": (*omsBatchTime).String()})
 	logger.Info("config", lager.Data{"CF_ENVIRONMENT": *environment})
@@ -135,6 +137,7 @@ func main() {
 	}
 	logger.Info("config", lager.Data{"LOG_EVENT_COUNT": *logEventCount})
 	logger.Info("config", lager.Data{"LOG_EVENT_COUNT_INTERVAL": (*logEventCountInterval).String()})
+	logger.Info("config", lager.Data{"CACHING_INTERVAL": (*cachingInterval).String()})
 	if len(*envelopeFilter) > 0 {
 		*envelopeFilter = strings.ToUpper(*envelopeFilter)
 		// by default we don't filter any events
@@ -176,6 +179,7 @@ func main() {
 		OmsTypePrefix:         omsTypePrefix,
 		OmsBatchTime:          *omsBatchTime,
 		OmsMaxMsgNumPerBatch:  *omsMaxMsgNumPerBatch,
+		InitializeCache:       *initializeCache,
 		ExcludeMetricEvents:   excludeMetricEvents,
 		ExcludeLogEvents:      excludeLogEvents,
 		ExcludeHttpEvents:     excludeHttpEvents,
