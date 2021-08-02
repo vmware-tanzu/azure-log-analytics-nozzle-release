@@ -140,8 +140,9 @@ forms:
      default: false
    - name: initialize_cache
      type: boolean
-     label: Don't ask for all app names on startup
-     default: false
+     label: Populate app name chache
+     description: Each nozzle queries all the app names and space names on startup.
+     default: true
    - name: envelope_filter
      type: multi_select_options
      label: Envelope Types to be Filtered out
