@@ -140,7 +140,7 @@ forms:
      default: false
    - name: initialize_cache
      type: boolean
-     label: Populate app name chache
+     label: Populate app name cache
      description: Each nozzle queries all the app names and space names on startup.
      default: true
    - name: envelope_filter
