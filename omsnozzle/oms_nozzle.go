@@ -20,10 +20,17 @@ import (
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/messages"
 )
 
+type ProcessedMessage struct {
+	msgType string
+	data    interface{}
+}
+
 type OmsNozzle struct {
 	logger              lager.Logger
+	maxCCGoroutines     int
 	errChan             <-chan error
-	msgChan             <-chan *events.Envelope
+	msgChan             chan *events.Envelope
+	processedMessages   chan ProcessedMessage
 	signalChan          chan os.Signal
 	omsClient           client.Client
 	firehoseClient      firehose.Client
@@ -54,13 +61,14 @@ func NewOmsNozzle(logger lager.Logger, firehoseClient firehose.Client, omsClient
 	maxPostGoroutines := int(100000 / nozzleConfig.OmsMaxMsgNumPerBatch)
 	return &OmsNozzle{
 		logger:              logger,
-		errChan:             make(<-chan error),
-		msgChan:             make(<-chan *events.Envelope),
+		msgChan:             make(chan *events.Envelope, 100000),
+		processedMessages:   make(chan ProcessedMessage, 1000),
 		signalChan:          make(chan os.Signal, 2),
 		omsClient:           omsClient,
 		firehoseClient:      firehoseClient,
 		nozzleConfig:        nozzleConfig,
 		goroutineSem:        make(chan int, maxPostGoroutines),
+		maxCCGoroutines:     maxPostGoroutines / 10,
 		cachingClient:       caching,
 		totalEventsReceived: uint64(0),
 		totalEventsSent:     uint64(0),
@@ -76,14 +84,112 @@ func (o *OmsNozzle) Start() error {
 
 	// setup for termination signal from CF
 	signal.Notify(o.signalChan, syscall.SIGTERM, syscall.SIGINT)
-
-	o.msgChan, o.errChan = o.firehoseClient.Connect()
-
+	go o.readEnvelopes()
+	for i := 0; i <= o.maxCCGoroutines; i++ {
+		//this should also be refactored
+		go o.processEnvelopes()
+	}
 	if o.nozzleConfig.LogEventCount {
 		o.logTotalEvents(o.nozzleConfig.LogEventCountInterval)
 	}
 	err := o.routeEvents()
 	return err
+}
+
+func (o *OmsNozzle) readEnvelopes() {
+	msgChan, errChan := o.firehoseClient.Connect()
+	i := 0
+	for {
+		select {
+		case msg := <-msgChan:
+			select {
+			case o.msgChan <- msg:
+			default:
+				i = i + 1
+				if i%1000 == 0 {
+					o.logger.Error("dropping messages ", nil, lager.Data{"total dropped": i})
+				}
+			}
+		case err := <-errChan:
+			o.logger.Error("Error while reading from the firehose", err)
+
+			if strings.Contains(err.Error(), "close 1008 (policy violation)") {
+				o.logger.Error("Disconnected because nozzle couldn't keep up. Please try scaling up the nozzle.", nil)
+				o.logSlowConsumerAlert()
+			}
+
+			o.logger.Error("Closing connection with traffic controller", nil)
+			o.firehoseClient.CloseConsumer()
+			msgChan, errChan = o.firehoseClient.Connect()
+		}
+	}
+}
+
+func (o *OmsNozzle) processEnvelopes() {
+	for {
+		msg := <-o.msgChan
+		o.totalEventsReceived++
+		// process message
+		var omsMessage OMSMessage
+		var omsMessageType = msg.GetEventType().String()
+		switch msg.GetEventType() {
+		// Metrics
+		case events.Envelope_ValueMetric:
+			if !o.nozzleConfig.ExcludeMetricEvents {
+				omsMessage = messages.NewValueMetric(msg, o.cachingClient)
+				o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
+			}
+		case events.Envelope_CounterEvent:
+			m := messages.NewCounterEvent(msg, o.cachingClient)
+			if strings.Contains(m.Name, "TruncatingBuffer.DroppedMessage") {
+				o.logger.Error("received TruncatingBuffer alert", nil)
+				o.logSlowConsumerAlert()
+			}
+			if strings.Contains(m.Name, "doppler_proxy.slow_consumer") && m.Delta > 0 {
+				o.logger.Error("received slow_consumer alert", nil)
+				o.logSlowConsumerAlert()
+			}
+			if !o.nozzleConfig.ExcludeMetricEvents {
+				omsMessage = m
+				o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
+			}
+
+		case events.Envelope_ContainerMetric:
+			if !o.nozzleConfig.ExcludeMetricEvents {
+				omsMessage = messages.NewContainerMetric(msg, o.cachingClient)
+				if omsMessage != nil {
+					o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
+				}
+			}
+
+		// Logs Errors
+		case events.Envelope_LogMessage:
+			if !o.nozzleConfig.ExcludeLogEvents {
+				omsMessage = messages.NewLogMessage(msg, o.cachingClient)
+				if omsMessage != nil {
+					o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
+				}
+			}
+
+		case events.Envelope_Error:
+			if !o.nozzleConfig.ExcludeLogEvents {
+				omsMessage = messages.NewError(msg, o.cachingClient)
+				o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
+			}
+
+		// HTTP Start/Stop
+		case events.Envelope_HttpStartStop:
+			if !o.nozzleConfig.ExcludeHttpEvents {
+				omsMessage = messages.NewHTTPStartStop(msg, o.cachingClient)
+				if omsMessage != nil {
+					o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
+				}
+			}
+		default:
+			o.logger.Info("uncategorized message", lager.Data{"message": msg.String()})
+		}
+	}
+
 }
 
 func (o *OmsNozzle) logTotalEvents(interval time.Duration) {
@@ -209,68 +315,8 @@ func (o *OmsNozzle) routeEvents() error {
 			pendingEvents = make(map[string][]interface{})
 			o.goroutineSem <- 1
 			go o.postData(&currentEvents, true)
-		case msg := <-o.msgChan:
-			o.totalEventsReceived++
-			// process message
-			var omsMessage OMSMessage
-			var omsMessageType = msg.GetEventType().String()
-			switch msg.GetEventType() {
-			// Metrics
-			case events.Envelope_ValueMetric:
-				if !o.nozzleConfig.ExcludeMetricEvents {
-					omsMessage = messages.NewValueMetric(msg, o.cachingClient)
-					pendingEvents[omsMessageType] = append(pendingEvents[omsMessageType], omsMessage)
-				}
-			case events.Envelope_CounterEvent:
-				m := messages.NewCounterEvent(msg, o.cachingClient)
-				if strings.Contains(m.Name, "TruncatingBuffer.DroppedMessage") {
-					o.logger.Error("received TruncatingBuffer alert", nil)
-					o.logSlowConsumerAlert()
-				}
-				if strings.Contains(m.Name, "doppler_proxy.slow_consumer") && m.Delta > 0 {
-					o.logger.Error("received slow_consumer alert", nil)
-					o.logSlowConsumerAlert()
-				}
-				if !o.nozzleConfig.ExcludeMetricEvents {
-					omsMessage = m
-					pendingEvents[omsMessageType] = append(pendingEvents[omsMessageType], omsMessage)
-				}
-
-			case events.Envelope_ContainerMetric:
-				if !o.nozzleConfig.ExcludeMetricEvents {
-					omsMessage = messages.NewContainerMetric(msg, o.cachingClient)
-					if omsMessage != nil {
-						pendingEvents[omsMessageType] = append(pendingEvents[omsMessageType], omsMessage)
-					}
-				}
-
-			// Logs Errors
-			case events.Envelope_LogMessage:
-				if !o.nozzleConfig.ExcludeLogEvents {
-					omsMessage = messages.NewLogMessage(msg, o.cachingClient)
-					if omsMessage != nil {
-						pendingEvents[omsMessageType] = append(pendingEvents[omsMessageType], omsMessage)
-					}
-				}
-
-			case events.Envelope_Error:
-				if !o.nozzleConfig.ExcludeLogEvents {
-					omsMessage = messages.NewError(msg, o.cachingClient)
-					pendingEvents[omsMessageType] = append(pendingEvents[omsMessageType], omsMessage)
-				}
-
-			// HTTP Start/Stop
-			case events.Envelope_HttpStartStop:
-				if !o.nozzleConfig.ExcludeHttpEvents {
-					omsMessage = messages.NewHTTPStartStop(msg, o.cachingClient)
-					if omsMessage != nil {
-						pendingEvents[omsMessageType] = append(pendingEvents[omsMessageType], omsMessage)
-					}
-				}
-			default:
-				o.logger.Info("uncategorized message", lager.Data{"message": msg.String()})
-				continue
-			}
+		case msg := <-o.processedMessages:
+			pendingEvents[msg.msgType] = append(pendingEvents[msg.msgType], msg.data)
 			// When the number of one type of events reaches the max per batch, trigger the post immediately
 			doPost := false
 			for _, v := range pendingEvents {
@@ -285,21 +331,6 @@ func (o *OmsNozzle) routeEvents() error {
 				o.goroutineSem <- 1
 				go o.postData(&currentEvents, true)
 			}
-		case err := <-o.errChan:
-			o.logger.Error("Error while reading from the firehose", err)
-
-			if strings.Contains(err.Error(), "close 1008 (policy violation)") {
-				o.logger.Error("Disconnected because nozzle couldn't keep up. Please try scaling up the nozzle.", nil)
-				o.logSlowConsumerAlert()
-			}
-
-			// post the buffered messages
-			o.goroutineSem <- 1
-			o.postData(&pendingEvents, true)
-
-			o.logger.Error("Closing connection with traffic controller", nil)
-			o.firehoseClient.CloseConsumer()
-			return err
 		}
 	}
 }

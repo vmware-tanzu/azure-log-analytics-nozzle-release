@@ -5,6 +5,7 @@ package caching
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"sync"
@@ -15,13 +16,13 @@ import (
 )
 
 type AppInfo struct {
-	Name        string `json:"name"`
-	Org         string `json:"org"`
-	OrgID       string `json:"orgId"`
-	Space       string `json:"space"`
-	SpaceID     string `json:"spaceId"`
-	LastFetched time.Time
-	Monitored   bool `json:"monitored"`
+	Name      string `json:"name"`
+	Org       string `json:"org"`
+	OrgID     string `json:"orgId"`
+	Space     string `json:"space"`
+	SpaceID   string `json:"spaceId"`
+	Expires   time.Time
+	Monitored bool `json:"monitored"`
 }
 
 type Caching struct {
@@ -68,12 +69,12 @@ func NewCaching(config *cfclient.Config, logger lager.Logger, environment string
 
 func (c *Caching) addAppinfoRecord(app cfclient.App) {
 	var appInfo = AppInfo{
-		Name:        app.Name,
-		Org:         app.SpaceData.Entity.OrgData.Entity.Name,
-		OrgID:       app.SpaceData.Entity.OrgData.Entity.Guid,
-		Space:       app.SpaceData.Entity.Name,
-		SpaceID:     app.SpaceData.Entity.Guid,
-		LastFetched: time.Now(),
+		Name:    app.Name,
+		Org:     app.SpaceData.Entity.OrgData.Entity.Name,
+		OrgID:   app.SpaceData.Entity.OrgData.Entity.Guid,
+		Space:   app.SpaceData.Entity.Name,
+		SpaceID: app.SpaceData.Entity.Guid,
+		Expires: time.Now().Add(c.cachingInterval * time.Duration(rand.Float64()+1)),
 	}
 	if c.spaceWhiteList == nil ||
 		c.spaceWhiteList[app.SpaceData.Entity.OrgData.Entity.Name] ||
@@ -128,7 +129,7 @@ func (c *Caching) GetAppInfo(appGuid string) AppInfo {
 		c.appInfoLock.RLock()
 		defer c.appInfoLock.RUnlock()
 		appInfo, ok = c.appInfosByGuid[appGuid]
-		if ok && time.Now().Sub(appInfo.LastFetched) >= c.cachingInterval {
+		if ok && time.Now().After(appInfo.Expires) {
 			old = true
 		}
 	}()
@@ -141,6 +142,7 @@ func (c *Caching) GetAppInfo(appGuid string) AppInfo {
 		}
 		// call the client api to get the name for this app
 		// purposely create a new client due to issue in using a single client
+		start := time.Now()
 		cfClient, err := cfclient.NewClient(c.cfClientConfig)
 		if err != nil {
 			c.logger.Error("error creating cfclient", err)
@@ -154,6 +156,8 @@ func (c *Caching) GetAppInfo(appGuid string) AppInfo {
 			}
 		}
 		app, err := cfClient.AppByGuid(appGuid)
+		stop := time.Now()
+		c.logger.Debug("app info lookup time", nil, lager.Data{"time_ms": stop.Sub(start).Milliseconds()})
 		if err != nil {
 			c.logger.Error("error getting app info", err, lager.Data{"guid": appGuid})
 			return AppInfo{
