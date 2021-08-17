@@ -41,7 +41,6 @@ type OmsNozzle struct {
 	totalEventsSent     uint64
 	totalEventsLost     uint64
 	totalDataSent       uint64
-	initializeCache     bool
 	mutex               *sync.Mutex
 }
 
@@ -52,7 +51,6 @@ type NozzleConfig struct {
 	ExcludeMetricEvents   bool
 	ExcludeLogEvents      bool
 	ExcludeHttpEvents     bool
-	InitializeCache       bool
 	LogEventCount         bool
 	LogEventCountInterval time.Duration
 }
@@ -74,13 +72,12 @@ func NewOmsNozzle(logger lager.Logger, firehoseClient firehose.Client, omsClient
 		totalEventsSent:     uint64(0),
 		totalEventsLost:     uint64(0),
 		totalDataSent:       uint64(0),
-		initializeCache:     nozzleConfig.InitializeCache,
 		mutex:               &sync.Mutex{},
 	}
 }
 
 func (o *OmsNozzle) Start() error {
-	o.cachingClient.Initialize(o.initializeCache)
+	o.cachingClient.Initialize()
 
 	// setup for termination signal from CF
 	signal.Notify(o.signalChan, syscall.SIGTERM, syscall.SIGINT)
@@ -107,7 +104,7 @@ func (o *OmsNozzle) readEnvelopes() {
 			default:
 				i = i + 1
 				if i%1000 == 0 {
-					o.logger.Error("dropping messages ", nil, lager.Data{"total dropped": i})
+					o.logger.Error("dropping messages", nil, lager.Data{"total dropped": i})
 				}
 			}
 		case err := <-errChan:

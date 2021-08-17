@@ -23,6 +23,6 @@ func (c *MockCaching) GetEnvironmentName() string {
 	return c.EnvironmentName
 }
 
-func (c *MockCaching) Initialize(loadApps bool) {
+func (c *MockCaching) Initialize() {
 	return
 }

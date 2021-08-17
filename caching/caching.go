@@ -5,7 +5,6 @@ package caching
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
 	"strings"
 	"sync"
@@ -21,8 +20,7 @@ type AppInfo struct {
 	OrgID     string `json:"orgId"`
 	Space     string `json:"space"`
 	SpaceID   string `json:"spaceId"`
-	Expires   time.Time
-	Monitored bool `json:"monitored"`
+	Monitored bool   `json:"monitored"`
 }
 
 type Caching struct {
@@ -40,7 +38,7 @@ type CachingClient interface {
 	GetAppInfo(string) AppInfo
 	GetInstanceName() string
 	GetEnvironmentName() string
-	Initialize(bool)
+	Initialize()
 }
 
 func NewCaching(config *cfclient.Config, logger lager.Logger, environment string, spaceFilter string, cachingInterval time.Duration) CachingClient {
@@ -74,21 +72,13 @@ func (c *Caching) addAppinfoRecord(app cfclient.App) {
 		OrgID:   app.SpaceData.Entity.OrgData.Entity.Guid,
 		Space:   app.SpaceData.Entity.Name,
 		SpaceID: app.SpaceData.Entity.Guid,
-		Expires: time.Now().Add(c.cachingInterval * time.Duration(rand.Float64()+1)),
 	}
-	if c.spaceWhiteList == nil ||
-		c.spaceWhiteList[app.SpaceData.Entity.OrgData.Entity.Name] ||
+	appInfo.Monitored = c.spaceWhiteList == nil || c.spaceWhiteList[app.SpaceData.Entity.OrgData.Entity.Name] ||
 		c.spaceWhiteList[app.SpaceData.Entity.OrgData.Entity.Name+"."+app.SpaceData.Entity.Name] ||
-		c.spaceWhiteList[app.SpaceData.Entity.OrgData.Entity.Name+"."+app.SpaceData.Entity.Name+"."+app.Name] {
-		appInfo.Monitored = true
-	} else {
-		appInfo.Monitored = false
-	}
-	func() {
-		c.appInfoLock.Lock()
-		defer c.appInfoLock.Unlock()
-		c.appInfosByGuid[app.Guid] = appInfo
-	}()
+		c.spaceWhiteList[app.SpaceData.Entity.OrgData.Entity.Name+"."+app.SpaceData.Entity.Name+"."+app.Name]
+	c.appInfoLock.Lock()
+	c.appInfosByGuid[app.Guid] = appInfo
+	c.appInfoLock.Unlock()
 	c.logger.Debug("adding to app info cache",
 		lager.Data{"guid": app.Guid},
 		lager.Data{"info": appInfo},
@@ -96,29 +86,71 @@ func (c *Caching) addAppinfoRecord(app cfclient.App) {
 	return
 }
 
-func (c *Caching) Initialize(loadApps bool) {
+func (c *Caching) Initialize() {
 	c.setInstanceName()
 
-	if !loadApps {
-		return
-	}
+	c.refreshCache()
 
+	c.logger.Info("Cache initialize completed",
+		lager.Data{"cache size": len(c.appInfosByGuid)})
+	go func() {
+		ticker := time.NewTicker(c.cachingInterval)
+		select {
+		case <-ticker.C:
+			c.refreshCache()
+		}
+	}()
+}
+
+func (c *Caching) refreshCache() {
 	cfClient, err := cfclient.NewClient(c.cfClientConfig)
 	if err != nil {
 		c.logger.Fatal("error creating cfclient", err)
 	}
 
-	apps, err := cfClient.ListApps()
+	apps, err := cfClient.ListAppsByQuery(nil)
 	if err != nil {
 		c.logger.Fatal("error getting app list", err)
 	}
 
-	for _, app := range apps {
-		c.addAppinfoRecord(app)
+	spaces, err := cfClient.ListSpaces()
+	if err != nil {
+		c.logger.Fatal("error getting spaces list", err)
 	}
 
-	c.logger.Info("Cache initialize completed",
-		lager.Data{"cache size": len(c.appInfosByGuid)})
+	spaceMap := make(map[string]cfclient.Space)
+	for _, space := range spaces {
+		spaceMap[space.Guid] = space
+	}
+
+	orgs, err := cfClient.ListOrgs()
+	if err != nil {
+		c.logger.Fatal("error getting spaces list", err)
+	}
+	orgMap := make(map[string]cfclient.Org)
+	for _, org := range orgs {
+		orgMap[org.Guid] = org
+	}
+
+	newAppInfo := make(map[string]AppInfo)
+	for _, app := range apps {
+		appInfo := AppInfo{
+			Name:    app.Name,
+			Org:     orgMap[spaceMap[app.SpaceGuid].OrganizationGuid].Name,
+			OrgID:   spaceMap[app.SpaceGuid].OrganizationGuid,
+			Space:   spaceMap[app.SpaceGuid].Name,
+			SpaceID: spaceMap[app.SpaceGuid].Guid,
+		}
+		appInfo.Monitored = c.spaceWhiteList == nil || c.spaceWhiteList[appInfo.Org] ||
+			c.spaceWhiteList[appInfo.Org+"."+appInfo.Space] ||
+			c.spaceWhiteList[appInfo.Org+"."+appInfo.Space+"."+appInfo.Name]
+		newAppInfo[app.Guid] = appInfo
+	}
+
+	c.appInfoLock.Lock()
+	c.appInfosByGuid = newAppInfo
+	c.appInfoLock.Unlock()
+	return
 }
 
 func (c *Caching) GetAppInfo(appGuid string) AppInfo {
@@ -129,9 +161,6 @@ func (c *Caching) GetAppInfo(appGuid string) AppInfo {
 		c.appInfoLock.RLock()
 		defer c.appInfoLock.RUnlock()
 		appInfo, ok = c.appInfosByGuid[appGuid]
-		if ok && time.Now().After(appInfo.Expires) {
-			old = true
-		}
 	}()
 	if ok && !old {
 		return appInfo
