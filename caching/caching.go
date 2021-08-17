@@ -105,17 +105,20 @@ func (c *Caching) Initialize() {
 func (c *Caching) refreshCache() {
 	cfClient, err := cfclient.NewClient(c.cfClientConfig)
 	if err != nil {
-		c.logger.Fatal("error creating cfclient", err)
+		c.logger.Error("error creating cfclient", err)
+		return
 	}
 
 	apps, err := cfClient.ListAppsByQuery(nil)
 	if err != nil {
-		c.logger.Fatal("error getting app list", err)
+		c.logger.Error("error getting app list", err)
+		return
 	}
 
 	spaces, err := cfClient.ListSpaces()
 	if err != nil {
-		c.logger.Fatal("error getting spaces list", err)
+		c.logger.Error("error getting spaces list", err)
+		return
 	}
 
 	spaceMap := make(map[string]cfclient.Space)
@@ -125,7 +128,8 @@ func (c *Caching) refreshCache() {
 
 	orgs, err := cfClient.ListOrgs()
 	if err != nil {
-		c.logger.Fatal("error getting spaces list", err)
+		c.logger.Error("error getting org list", err)
+		return
 	}
 	orgMap := make(map[string]cfclient.Org)
 	for _, org := range orgs {
