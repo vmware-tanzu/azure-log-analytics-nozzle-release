@@ -199,21 +199,20 @@ var _ = Describe("LogEventCount", func() {
 			ValueMetric: &events.ValueMetric{},
 		}
 
-		firehoseClient.MessageChan <- envelope
-
-		eventType = events.Envelope_LogMessage
+		eventType2 := events.Envelope_LogMessage
 		messageType := events.LogMessage_OUT
 
 		logMessage := events.LogMessage{
 			MessageType: &messageType,
 		}
 
-		envelope = &events.Envelope{
-			EventType:  &eventType,
+		envelope2 := &events.Envelope{
+			EventType:  &eventType2,
 			LogMessage: &logMessage,
 		}
 
 		firehoseClient.MessageChan <- envelope
+		firehoseClient.MessageChan <- envelope2
 
 		regExp := "\"Total\":2,\"CounterKey\":\"nozzle.stats.eventsReceived\".*\"Total\":2,\"CounterKey\":\"nozzle.stats.eventsSent\""
 		Eventually(func() string {

@@ -6,6 +6,8 @@ package messages_test
 import (
 	"crypto/md5"
 	hex "encoding/hex"
+	"encoding/json"
+	"math"
 	"time"
 
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/caching"
@@ -418,5 +420,38 @@ var _ = Describe("Messages", func() {
 		Expect(m.MetricKey).To(Equal("job.rep.memoryStats.numBytesAllocatedHeap"))
 		Expect(m.BaseMessage.EventType).To(Equal(eventType.String()))
 		Expect(m.BaseMessage.Environment).To(Equal(environmentName))
+	})
+
+	It("creates ValueMetric with NaN, INF and -INF and can marshall correctly ", func() {
+		eventType := events.Envelope_ValueMetric
+		name := "memoryStats.numBytesAllocatedHeap"
+		values := []float64{math.NaN(), math.Inf(1), math.Inf(-1), float64(10)}
+		unit := "count"
+		origin := "rep"
+		job := "job"
+		valueMetrics := make([]messages.ValueMetric, 0)
+		for _, value := range values {
+			metric := events.ValueMetric{
+				Name:  &name,
+				Value: &value,
+				Unit:  &unit,
+			}
+
+			envelope := &events.Envelope{
+				EventType:   &eventType,
+				ValueMetric: &metric,
+				Job:         &job,
+				Origin:      &origin,
+			}
+			valueMetrics = append(valueMetrics, *messages.NewValueMetric(envelope, cache))
+		}
+
+		_, err := json.Marshal(valueMetrics)
+		Expect(err).ToNot(HaveOccurred())
+
+		Expect(valueMetrics[0].Value).To(Equal("NaN"))
+		Expect(valueMetrics[1].Value).To(Equal("Infinity"))
+		Expect(valueMetrics[2].Value).To(Equal("-Infinity"))
+		Expect(valueMetrics[3].Value).To(Equal(float64(10)))
 	})
 })

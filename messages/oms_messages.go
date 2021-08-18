@@ -9,6 +9,7 @@ import (
 	"encoding/binary"
 	hex "encoding/hex"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -262,7 +263,7 @@ func NewCounterEvent(e *events.Envelope, c caching.CachingClient) *CounterEvent 
 type ValueMetric struct {
 	BaseMessage
 	Name      string
-	Value     float64
+	Value     interface{}
 	Unit      string
 	MetricKey string
 }
@@ -274,6 +275,14 @@ func NewValueMetric(e *events.Envelope, c caching.CachingClient) *ValueMetric {
 		Name:        e.ValueMetric.GetName(),
 		Value:       e.ValueMetric.GetValue(),
 		Unit:        e.ValueMetric.GetUnit(),
+	}
+
+	if math.IsNaN(e.ValueMetric.GetValue()) {
+		r.Value = "NaN"
+	} else if math.IsInf(e.ValueMetric.GetValue(), 1) {
+		r.Value = "Infinity"
+	} else if math.IsInf(e.ValueMetric.GetValue(), -1) {
+		r.Value = "-Infinity"
 	}
 	r.MetricKey = fmt.Sprintf("%s.%s.%s", r.Job, e.GetOrigin(), r.Name)
 	return &r
