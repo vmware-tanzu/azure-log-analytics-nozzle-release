@@ -5,6 +5,7 @@ package caching
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"sync"
@@ -39,6 +40,11 @@ type CachingClient interface {
 	GetInstanceName() string
 	GetEnvironmentName() string
 	Initialize()
+}
+
+func init() {
+	// seed rand library in a way that's going to be unique per AI
+	rand.Seed(time.Now().UnixNano())
 }
 
 func NewCaching(config *cfclient.Config, logger lager.Logger, environment string, spaceFilter string, cachingInterval time.Duration) CachingClient {
@@ -94,6 +100,7 @@ func (c *Caching) Initialize() {
 	c.logger.Info("Cache initialize completed",
 		lager.Data{"cache size": len(c.appInfosByGuid)})
 	go func() {
+		time.Sleep(time.Duration(float64(c.cachingInterval) * rand.Float64()))
 		ticker := time.NewTicker(c.cachingInterval)
 		select {
 		case <-ticker.C:
@@ -103,6 +110,7 @@ func (c *Caching) Initialize() {
 }
 
 func (c *Caching) refreshCache() {
+	c.logger.Debug("Refreshing Cache")
 	cfClient, err := cfclient.NewClient(c.cfClientConfig)
 	if err != nil {
 		c.logger.Error("error creating cfclient", err)
@@ -154,6 +162,7 @@ func (c *Caching) refreshCache() {
 	c.appInfoLock.Lock()
 	c.appInfosByGuid = newAppInfo
 	c.appInfoLock.Unlock()
+	c.logger.Debug("Refreshed")
 	return
 }
 
