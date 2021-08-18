@@ -56,10 +56,10 @@ type NozzleConfig struct {
 }
 
 func NewOmsNozzle(logger lager.Logger, firehoseClient firehose.Client, omsClient client.Client, nozzleConfig *NozzleConfig, caching caching.CachingClient) *OmsNozzle {
-	maxPostGoroutines := int(1000 / nozzleConfig.OmsMaxMsgNumPerBatch)
+	maxPostGoroutines := int(100000 / nozzleConfig.OmsMaxMsgNumPerBatch)
 	return &OmsNozzle{
 		logger:              logger,
-		msgChan:             make(chan *events.Envelope, 100000),
+		msgChan:             make(chan *events.Envelope, 1000),
 		processedMessages:   make(chan ProcessedMessage, 1000),
 		signalChan:          make(chan os.Signal, 2),
 		omsClient:           omsClient,
