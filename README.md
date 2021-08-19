@@ -59,6 +59,7 @@ OMS_WORKSPACE             : OMS workspace ID
 OMS_KEY                   : OMS key
 OMS_POST_TIMEOUT          : HTTP post timeout for sending events to OMS Log Analytics
 OMS_BATCH_TIME            : Interval for posting a batch to OMS Log Analytics
+CACHING_INTERVAL          : Interval for refreshing already fetched app info for enriching log data. 
 OMS_MAX_MSG_NUM_PER_BATCH : The max number of messages in a batch to OMS Log Analytics
 API_ADDR                  : The API address of the CF environment. If set empty or absent, nozzle will use API address for current CF environment
 AZURE_RESOURCE_ID         : Resource Id to include as an HTTP header when posting events
@@ -85,11 +86,11 @@ cf push
 
 For the most part, the Nozzle for VMware Tanzu for Microsoft Azure Log Analytics forwards metrics from the Loggregator Firehose to OMS Log Analytics without too much processing. In a few cases the nozzle might push some additional metrics to OMS Log Analytics.
 
-### 1. eventsReceived, eventsSent and eventsLost
+### 1. eventsReceived, eventsSent, eventsLost, and eventsDropped
 
-If `LOG_EVENT_COUNT` is set to true, the nozzle will periodically send to OMS Log Analytics the count of received events, sent events and lost events, at intervals of `LOG_EVENT_COUNT_INTERVAL`.
+If `LOG_EVENT_COUNT` is set to true, the nozzle will periodically send to OMS Log Analytics the count of received events, sent events, lost events, and dropped events, at intervals of `LOG_EVENT_COUNT_INTERVAL`.
 
-The statistic count is sent as a CounterEvent, with CounterKey of one of **`nozzle.stats.eventsReceived`**, **`nozzle.stats.eventsSent`** and **`nozzle.stats.eventsLost`**. Each CounterEvent contains the value of delta count during the interval, and the total count from the beginning. **`eventsReceived`** counts all the events that the nozzle received from firehose, **`eventsSent`** counts all the events that the nozzle sent to OMS Log Analytics successfully, **`eventsLost`** counts all the events that the nozzle tried to send but failed after 4 attempts.
+The statistic count is sent as a CounterEvent, with CounterKey of one of **`nozzle.stats.eventsReceived`**, **`nozzle.stats.eventsSent`**, **`nozzle.stats.eventsLost`**, and **`nozzle.stats.eventsDropped`**. Each CounterEvent contains the value of delta count during the interval, and the total count from the beginning. **`eventsReceived`** counts all the events that the nozzle received from firehose, **`eventsSent`** counts all the events that the nozzle sent to OMS Log Analytics successfully, **`eventsLost`** counts all the events that the nozzle tried to send but failed after 4 attempts.
 
 These CounterEvents themselves are not counted in the received, sent or lost count.
 
@@ -113,11 +114,11 @@ This ValueMetric is not counted in the above statistic received, sent or lost co
 
 Operators should run at least two instances of the nozzle to reduce message loss. The Firehose will evenly distribute events across all instances of the nozzle.
 
-When the nozzle couldn't keep up with processing the logs from firehose, Loggregator alerts the nozzle and then the nozzle logs slowConsumerAlert message to OMS Log Analytics. Operator can [create Alert rule](#alert) for this slowConsumerAlert message in OMS Log Analytics, and when the alert is triggered, the operator should scale up the nozzle to minimize the loss of data.
+When the nozzle couldn't keep up with processing the logs from firehose, Loggregator will usually disconnect the application. Look for repeated disconnects from the nozzle or slow consumer alerts in the traffic controller's logs.
 
 We did some workload test against the nozzle and got a few data for operaters' reference:
-
-* In our test, the size of each log and metric sent to OMS Log Analytics is around 550 bytes, suggest each nozzle instance should handle no more than **300000** such messages per minute. Under such workload, the CPU usage of each instance is around 40%, and the memory usage of each instance is around 80M.
+(NOTE: This data is outdated).
+* In our test, the size of each log and metric sent to OMS Log Analytics is around 550 bytes, suggest each nozzle instance should handle no more than **300000** such messages per minute. Under such workload, the CPU usage of each instance is around 40%, and the memory usage of each instance is around 80M
 
 ### 2. Scaling Loggregator
 
