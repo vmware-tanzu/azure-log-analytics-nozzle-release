@@ -218,5 +218,9 @@ var _ = Describe("LogEventCount", func() {
 		Eventually(func() string {
 			return omsClient.GetPostedMessages()["CF_CounterEvent"]
 		}).Should(MatchRegexp(regExp))
+		regExp2 := "\"nozzle.stats.eventsDropped\""
+		Eventually(func() string {
+			return omsClient.GetPostedMessages()["CF_CounterEvent"]
+		}).Should(MatchRegexp(regExp2))
 	})
 })

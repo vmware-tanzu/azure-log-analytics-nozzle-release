@@ -41,6 +41,7 @@ type OmsNozzle struct {
 	totalEventsSent     uint64
 	totalEventsLost     uint64
 	totalDataSent       uint64
+	totalEventsDropped  uint64
 	mutex               *sync.Mutex
 }
 
@@ -72,6 +73,7 @@ func NewOmsNozzle(logger lager.Logger, firehoseClient firehose.Client, omsClient
 		totalEventsSent:     uint64(0),
 		totalEventsLost:     uint64(0),
 		totalDataSent:       uint64(0),
+		totalEventsDropped:  uint64(0),
 		mutex:               &sync.Mutex{},
 	}
 }
@@ -95,16 +97,15 @@ func (o *OmsNozzle) Start() error {
 
 func (o *OmsNozzle) readEnvelopes() {
 	msgChan, errChan := o.firehoseClient.Connect()
-	i := 0
 	for {
 		select {
 		case msg := <-msgChan:
 			select {
 			case o.msgChan <- msg:
 			default:
-				i = i + 1
-				if i%1000 == 0 {
-					o.logger.Error("dropping messages", nil, lager.Data{"total dropped": i})
+				o.totalEventsDropped = o.totalEventsDropped + 1
+				if o.totalEventsDropped%1000 == 0 {
+					o.logger.Error("dropping messages", nil, lager.Data{"total dropped": o.totalEventsDropped})
 				}
 			}
 		case err := <-errChan:
@@ -194,6 +195,7 @@ func (o *OmsNozzle) logTotalEvents(interval time.Duration) {
 	lastReceivedCount := uint64(0)
 	lastSentCount := uint64(0)
 	lastLostCount := uint64(0)
+	lastDroppedCount := uint64(0)
 
 	go func() {
 		for range logEventCountTicker.C {
@@ -201,12 +203,14 @@ func (o *OmsNozzle) logTotalEvents(interval time.Duration) {
 			totalReceivedCount := o.totalEventsReceived
 			totalSentCount := o.totalEventsSent
 			totalLostCount := o.totalEventsLost
+			totalDroppedCount := o.totalEventsDropped
 			currentEvents := make(map[string][]interface{})
 
 			// Generate CounterEvent
 			o.addEventCountEvent("eventsReceived", totalReceivedCount-lastReceivedCount, totalReceivedCount, &timeStamp, &currentEvents)
 			o.addEventCountEvent("eventsSent", totalSentCount-lastSentCount, totalSentCount, &timeStamp, &currentEvents)
 			o.addEventCountEvent("eventsLost", totalLostCount-lastLostCount, totalLostCount, &timeStamp, &currentEvents)
+			o.addEventCountEvent("eventsDropped", totalDroppedCount-lastDroppedCount, totalDroppedCount, &timeStamp, &currentEvents)
 
 			o.goroutineSem <- 1
 			o.postData(&currentEvents, false)
@@ -214,6 +218,7 @@ func (o *OmsNozzle) logTotalEvents(interval time.Duration) {
 			lastReceivedCount = totalReceivedCount
 			lastSentCount = totalSentCount
 			lastLostCount = totalLostCount
+			lastDroppedCount = totalDroppedCount
 		}
 	}()
 }
