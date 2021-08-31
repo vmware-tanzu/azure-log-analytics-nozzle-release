@@ -102,9 +102,11 @@ func (c *Caching) Initialize() {
 	go func() {
 		time.Sleep(time.Duration(float64(c.cachingInterval) * rand.Float64()))
 		ticker := time.NewTicker(c.cachingInterval)
-		select {
-		case <-ticker.C:
-			c.refreshCache()
+		for {
+			select {
+			case <-ticker.C:
+				c.refreshCache()
+			}
 		}
 	}()
 }
