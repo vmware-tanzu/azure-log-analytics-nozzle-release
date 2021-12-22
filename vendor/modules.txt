@@ -1,4 +1,5 @@
 # code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
+## explicit
 code.cloudfoundry.org/gofileutils/fileutils
 # code.cloudfoundry.org/lager v2.0.0+incompatible
 ## explicit
@@ -16,7 +17,7 @@ github.com/alecthomas/units
 # github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77
 ## explicit
 # github.com/cloudfoundry-community/go-cfclient v0.0.0-20210621174645-7773f7e22665
-## explicit
+## explicit; go 1.15
 github.com/cloudfoundry-community/go-cfclient
 # github.com/cloudfoundry/noaa v2.1.0+incompatible
 ## explicit
@@ -32,6 +33,7 @@ github.com/cloudfoundry/sonde-go/events
 # github.com/elazarl/goproxy/ext v0.0.0-20200426045556-49ad98f6dac1
 ## explicit
 # github.com/fsnotify/fsnotify v1.4.9
+## explicit; go 1.13
 github.com/fsnotify/fsnotify
 # github.com/gogo/protobuf v1.3.1
 ## explicit
@@ -39,25 +41,26 @@ github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 # github.com/golang/protobuf v1.5.2
-## explicit
+## explicit; go 1.9
 github.com/golang/protobuf/proto
 # github.com/gorilla/websocket v1.4.2
-## explicit
+## explicit; go 1.12
 github.com/gorilla/websocket
 # github.com/mailru/easyjson v0.7.1
-## explicit
+## explicit; go 1.12
 github.com/mailru/easyjson
 github.com/mailru/easyjson/buffer
 github.com/mailru/easyjson/jlexer
 github.com/mailru/easyjson/jwriter
 # github.com/nxadm/tail v1.4.4
+## explicit; go 1.13
 github.com/nxadm/tail
 github.com/nxadm/tail/ratelimiter
 github.com/nxadm/tail/util
 github.com/nxadm/tail/watch
 github.com/nxadm/tail/winfile
 # github.com/onsi/ginkgo v1.12.3
-## explicit
+## explicit; go 1.13
 github.com/onsi/ginkgo
 github.com/onsi/ginkgo/config
 github.com/onsi/ginkgo/internal/codelocation
@@ -95,23 +98,25 @@ github.com/onsi/gomega/types
 ## explicit
 github.com/pkg/errors
 # github.com/stretchr/testify v1.6.0
-## explicit
+## explicit; go 1.13
 # golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d
-## explicit
+## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 # golang.org/x/oauth2 v0.0.0-20210810183815-faf39c7919d5
-## explicit
+## explicit; go 1.11
 golang.org/x/oauth2
 golang.org/x/oauth2/clientcredentials
 golang.org/x/oauth2/internal
 # golang.org/x/sys v0.0.0-20210423082822-04245dca01da
+## explicit; go 1.12
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.6
+## explicit; go 1.11
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/htmlindex
@@ -130,10 +135,11 @@ golang.org/x/text/language
 golang.org/x/text/runes
 golang.org/x/text/transform
 # golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
+## explicit; go 1.11
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
 # google.golang.org/appengine v1.6.7
-## explicit
+## explicit; go 1.11
 google.golang.org/appengine/internal
 google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
@@ -142,7 +148,7 @@ google.golang.org/appengine/internal/remote_api
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
 # google.golang.org/protobuf v1.27.1
-## explicit
+## explicit; go 1.9
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
 google.golang.org/protobuf/internal/descfmt
@@ -174,7 +180,8 @@ google.golang.org/protobuf/types/descriptorpb
 ## explicit
 gopkg.in/alecthomas/kingpin.v2
 # gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7
+## explicit
 gopkg.in/tomb.v1
 # gopkg.in/yaml.v2 v2.4.0
-## explicit
+## explicit; go 1.15
 gopkg.in/yaml.v2
