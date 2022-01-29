@@ -89,7 +89,6 @@ func (c *Caching) addAppinfoRecord(app cfclient.App) {
 		lager.Data{"guid": app.Guid},
 		lager.Data{"info": appInfo},
 	)
-	return
 }
 
 func (c *Caching) Initialize() {
@@ -102,11 +101,8 @@ func (c *Caching) Initialize() {
 	go func() {
 		time.Sleep(time.Duration(float64(c.cachingInterval) * rand.Float64()))
 		ticker := time.NewTicker(c.cachingInterval)
-		for {
-			select {
-			case <-ticker.C:
-				c.refreshCache()
-			}
+		for range ticker.C {
+			c.refreshCache()
 		}
 	}()
 }
@@ -165,7 +161,6 @@ func (c *Caching) refreshCache() {
 	c.appInfosByGuid = newAppInfo
 	c.appInfoLock.Unlock()
 	c.logger.Debug("Refreshed")
-	return
 }
 
 func (c *Caching) GetAppInfo(appGuid string) AppInfo {

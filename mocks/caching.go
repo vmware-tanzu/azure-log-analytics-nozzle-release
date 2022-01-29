@@ -24,5 +24,4 @@ func (c *MockCaching) GetEnvironmentName() string {
 }
 
 func (c *MockCaching) Initialize() {
-	return
 }
