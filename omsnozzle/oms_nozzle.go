@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -126,7 +127,7 @@ func (o *OmsNozzle) readEnvelopes() {
 func (o *OmsNozzle) processEnvelopes() {
 	for {
 		msg := <-o.msgChan
-		o.totalEventsReceived++
+		atomic.AddUint64(&o.totalEventsReceived, 1)
 		// process message
 		var omsMessage OMSMessage
 		var omsMessageType = msg.GetEventType().String()
@@ -200,10 +201,10 @@ func (o *OmsNozzle) logTotalEvents(interval time.Duration) {
 	go func() {
 		for range logEventCountTicker.C {
 			timeStamp := time.Now().UnixNano()
-			totalReceivedCount := o.totalEventsReceived
-			totalSentCount := o.totalEventsSent
-			totalLostCount := o.totalEventsLost
-			totalDroppedCount := o.totalEventsDropped
+			totalReceivedCount := atomic.LoadUint64(&o.totalEventsReceived)
+			totalSentCount := atomic.LoadUint64(&o.totalEventsSent)
+			totalLostCount := atomic.LoadUint64(&o.totalEventsLost)
+			totalDroppedCount := atomic.LoadUint64(&o.totalEventsDropped)
 			currentEvents := make(map[string][]interface{})
 
 			// Generate CounterEvent
@@ -277,18 +278,14 @@ func (o *OmsNozzle) postData(events *map[string][]interface{}, addCount bool) {
 						time.Sleep(time.Second * 1)
 					} else {
 						if addCount {
-							o.mutex.Lock()
-							o.totalEventsSent += uint64(len(v))
-							o.totalDataSent += uint64(len(msgAsJson))
-							o.mutex.Unlock()
+							atomic.AddUint64(&o.totalEventsSent, uint64(len(v)))
+							atomic.AddUint64(&o.totalDataSent, uint64(len(v)))
 						}
 						break
 					}
 				}
 				if nRetries == 0 && addCount {
-					o.mutex.Lock()
-					o.totalEventsLost += uint64(len(v))
-					o.mutex.Unlock()
+					atomic.AddUint64(&o.totalEventsLost, uint64(len(v)))
 				}
 			}
 		}

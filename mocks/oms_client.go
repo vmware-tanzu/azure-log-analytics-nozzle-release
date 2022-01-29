@@ -24,9 +24,9 @@ func (c *MockOmsClient) PostData(msg *[]byte, logType string) error {
 	return nil
 }
 
-func (c *MockOmsClient) GetPostedMessages() map[string]string {
+func (c *MockOmsClient) GetPostedMessages(key string) string {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	return c.postedMessages
+	return c.postedMessages[key]
 }
