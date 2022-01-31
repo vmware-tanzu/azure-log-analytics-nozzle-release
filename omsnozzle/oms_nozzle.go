@@ -29,7 +29,6 @@ type ProcessedMessage struct {
 type OmsNozzle struct {
 	logger              lager.Logger
 	maxCCGoroutines     int
-	errChan             <-chan error
 	msgChan             chan *events.Envelope
 	processedMessages   chan ProcessedMessage
 	signalChan          chan os.Signal
@@ -357,8 +356,7 @@ func (o *OmsNozzle) logSlowConsumerAlert() {
 		ValueMetric: valueMetric,
 	}
 
-	var omsMsg OMSMessage
-	omsMsg = messages.NewValueMetric(envelope, o.cachingClient)
+	omsMsg := messages.NewValueMetric(envelope, o.cachingClient)
 	currentEvents := make(map[string][]interface{})
 	currentEvents[eventType.String()] = append(currentEvents[eventType.String()], omsMsg)
 
