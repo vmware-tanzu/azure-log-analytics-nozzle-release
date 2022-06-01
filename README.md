@@ -8,6 +8,8 @@ Azure [Log Analytics](https://azure.microsoft.com/en-us/services/log-analytics/)
 
 The Nozzle for VMware Tanzu for Microsoft Azure Log Analytics is a Cloud Foundry (CF) component which forwards metrics from the [Loggregator](https://docs.cloudfoundry.org/loggregator/architecture.html) Firehose to OMS Log Analytics. In the following document, it will be referred to as `Nozzle for VMware Tanzu for Microsoft Azure Log Analytics` or `nozzle` for short.
 
+If you have any questions, or want to get attention for a PR or issue please reach out on the [#logging-and-metrics channel in the cloudfoundry slack](https://cloudfoundry.slack.com/archives/CUW93AF3M)
+
 ## Prerequisites
 
 ### 1. Deploy a CF or PCF environment in Azure
