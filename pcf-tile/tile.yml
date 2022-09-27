@@ -34,7 +34,7 @@ packages:
     memory: 512M
     no-route: true
     env:
-      GOVERSION: go1.18
+      GOVERSION: go1.19
       GOPACKAGENAME: github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics
   health_check: none
 
