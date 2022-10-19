@@ -44,9 +44,9 @@ packages:
 # runs with the latest stemcell.
 #
 stemcell_criteria:
-  os: ubuntu-xenial
+  os: ubuntu-jammy
   requires_cpi: false
-  version: '621'
+  version: '1.18'
 
 # Add properties you want to pass to your applications.
 # Properties specified here will not be configurable by the user.
