@@ -128,13 +128,12 @@ func (o *OmsNozzle) processEnvelopes() {
 		msg := <-o.msgChan
 		atomic.AddUint64(&o.totalEventsReceived, 1)
 		// process message
-		var omsMessage OMSMessage
 		var omsMessageType = msg.GetEventType().String()
 		switch msg.GetEventType() {
 		// Metrics
 		case events.Envelope_ValueMetric:
 			if !o.nozzleConfig.ExcludeMetricEvents {
-				omsMessage = messages.NewValueMetric(msg, o.cachingClient)
+				omsMessage := messages.NewValueMetric(msg, o.cachingClient)
 				o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
 			}
 		case events.Envelope_CounterEvent:
@@ -148,14 +147,14 @@ func (o *OmsNozzle) processEnvelopes() {
 				o.logSlowConsumerAlert()
 			}
 			if !o.nozzleConfig.ExcludeMetricEvents {
-				omsMessage = m
+				omsMessage := m
 				o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
 			}
 
 		case events.Envelope_ContainerMetric:
 			if !o.nozzleConfig.ExcludeMetricEvents {
-				omsMessage = messages.NewContainerMetric(msg, o.cachingClient)
-				if omsMessage != nil {
+				omsMessage := messages.NewContainerMetric(msg, o.cachingClient)
+				if omsMessage != nil { //nolint:staticcheck
 					o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
 				}
 			}
@@ -163,7 +162,7 @@ func (o *OmsNozzle) processEnvelopes() {
 		// Logs Errors
 		case events.Envelope_LogMessage:
 			if !o.nozzleConfig.ExcludeLogEvents {
-				omsMessage = messages.NewLogMessage(msg, o.cachingClient)
+				omsMessage := messages.NewLogMessage(msg, o.cachingClient)
 				if omsMessage != nil {
 					o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
 				}
@@ -171,14 +170,14 @@ func (o *OmsNozzle) processEnvelopes() {
 
 		case events.Envelope_Error:
 			if !o.nozzleConfig.ExcludeLogEvents {
-				omsMessage = messages.NewError(msg, o.cachingClient)
+				omsMessage := messages.NewError(msg, o.cachingClient)
 				o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
 			}
 
 		// HTTP Start/Stop
 		case events.Envelope_HttpStartStop:
 			if !o.nozzleConfig.ExcludeHttpEvents {
-				omsMessage = messages.NewHTTPStartStop(msg, o.cachingClient)
+				omsMessage := messages.NewHTTPStartStop(msg, o.cachingClient)
 				if omsMessage != nil {
 					o.processedMessages <- ProcessedMessage{msgType: omsMessageType, data: omsMessage}
 				}
