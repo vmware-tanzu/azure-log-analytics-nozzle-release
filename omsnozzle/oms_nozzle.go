@@ -117,7 +117,7 @@ func (o *OmsNozzle) readEnvelopes() {
 			}
 
 			o.logger.Error("Closing connection with traffic controller", nil)
-			o.firehoseClient.CloseConsumer()
+			o.firehoseClient.CloseConsumer() //nolint:errcheck
 			msgChan, errChan = o.firehoseClient.Connect()
 		}
 	}

@@ -92,7 +92,7 @@ func (c *Caching) addAppinfoRecord(app cfclient.App) {
 }
 
 func (c *Caching) Initialize() {
-	c.setInstanceName()
+	c.setInstanceName() //nolint:errcheck
 
 	c.refreshCache()
 
