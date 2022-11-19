@@ -7,7 +7,7 @@ require (
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20210621174645-7773f7e22665
 	github.com/cloudfoundry/noaa v2.1.0+incompatible // pinned
 	github.com/cloudfoundry/sonde-go v0.0.0-20171206171820-b33733203bb4 // pinned
-	github.com/onsi/ginkgo v1.12.3
+	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.10.1
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )
@@ -25,7 +25,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
-	github.com/nxadm/tail v1.4.4 // indirect
+	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.6.0 // indirect
 	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d // indirect
