@@ -187,7 +187,7 @@ func main() {
 	cachingClient := caching.NewCaching(cfClientConfig, logger, *environment, *spaceFilter, *cachingInterval)
 	nozzle := omsnozzle.NewOmsNozzle(logger, firehoseClient, omsClient, nozzleConfig, cachingClient)
 
-	nozzle.Start()
+	logger.Error("nozzle exited", nozzle.Start())
 }
 
 func registerGoRoutineDumpSignalChannel() chan os.Signal {
@@ -201,7 +201,7 @@ func dumpGoRoutine(dumpChan chan os.Signal) {
 	for range dumpChan {
 		goRoutineProfiles := pprof.Lookup("goroutine")
 		if goRoutineProfiles != nil {
-			goRoutineProfiles.WriteTo(os.Stdout, 2)
+			goRoutineProfiles.WriteTo(os.Stdout, 2) //nolint:errcheck
 		}
 	}
 }

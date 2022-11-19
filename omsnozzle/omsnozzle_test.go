@@ -43,7 +43,7 @@ var _ = Describe("Omsnozzle", func() {
 		}
 
 		nozzle = omsnozzle.NewOmsNozzle(logger, firehoseClient, omsClient, nozzleConfig, cachingClient)
-		go nozzle.Start()
+		go nozzle.Start() //nolint:errcheck
 	})
 
 	It("routes a LogMessage", func() {
@@ -188,7 +188,7 @@ var _ = Describe("LogEventCount", func() {
 		}
 
 		nozzle = omsnozzle.NewOmsNozzle(logger, firehoseClient, omsClient, nozzleConfig, cachingClient)
-		go nozzle.Start()
+		go nozzle.Start() //nolint:errcheck
 	})
 
 	It("logs event count correctlty", func() {

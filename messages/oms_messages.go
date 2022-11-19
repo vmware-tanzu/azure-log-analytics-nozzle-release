@@ -128,7 +128,7 @@ func NewHTTPStartStop(e *events.Envelope, c caching.CachingClient) *HTTPStartSto
 	return &r
 }
 
-//A LogMessage contains a "log line" and associated metadata.
+// A LogMessage contains a "log line" and associated metadata.
 type LogMessage struct {
 	BaseMessage
 	Message            string
@@ -290,8 +290,8 @@ func NewValueMetric(e *events.Envelope, c caching.CachingClient) *ValueMetric {
 
 func cfUUIDToString(uuid *events.UUID) string {
 	lowBytes := new(bytes.Buffer)
-	binary.Write(lowBytes, binary.LittleEndian, uuid.Low)
+	binary.Write(lowBytes, binary.LittleEndian, uuid.Low) //nolint:errcheck
 	highBytes := new(bytes.Buffer)
-	binary.Write(highBytes, binary.LittleEndian, uuid.High)
+	binary.Write(highBytes, binary.LittleEndian, uuid.High) //nolint:errcheck
 	return fmt.Sprintf("%x-%x-%x-%x-%x", lowBytes.Bytes()[0:4], lowBytes.Bytes()[4:6], lowBytes.Bytes()[6:8], highBytes.Bytes()[0:2], highBytes.Bytes()[2:])
 }
