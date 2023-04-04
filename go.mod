@@ -8,7 +8,7 @@ require (
 	github.com/cloudfoundry/noaa v2.1.0+incompatible // pinned
 	github.com/cloudfoundry/sonde-go v0.0.0-20171206171820-b33733203bb4 // pinned
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.27.1
+	github.com/onsi/gomega v1.27.6
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )
 
@@ -22,17 +22,17 @@ require (
 	github.com/elazarl/goproxy/ext v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.6.0 // indirect
-	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20210810183815-faf39c7919d5 // indirect
-	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/text v0.8.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
