@@ -42,11 +42,6 @@ type CachingClient interface {
 	Initialize()
 }
 
-func init() {
-	// seed rand library in a way that's going to be unique per AI
-	rand.Seed(time.Now().UnixNano())
-}
-
 func NewCaching(config *cfclient.Config, logger lager.Logger, environment string, spaceFilter string, cachingInterval time.Duration) CachingClient {
 	var spaceWhiteList map[string]bool
 	if len(spaceFilter) > 0 {
