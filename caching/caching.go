@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/lager/v3"
 	cfclient "github.com/cloudfoundry-community/go-cfclient"
 )
 

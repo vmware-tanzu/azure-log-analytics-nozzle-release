@@ -4,8 +4,10 @@
 package mocks
 
 import (
-	"code.cloudfoundry.org/lager"
+	"net/http"
 	"sync"
+
+	"code.cloudfoundry.org/lager/v3"
 )
 
 type MockLogger struct {
@@ -78,4 +80,8 @@ func (m *MockLogger) GetLogs(level lager.LogLevel) []Log {
 	defer m.mutex.Unlock()
 
 	return m.logs[level]
+}
+
+func (m *MockLogger) WithTraceInfo(req *http.Request) lager.Logger {
+	panic("Not implemented")
 }

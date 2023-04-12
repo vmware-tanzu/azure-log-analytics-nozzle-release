@@ -13,7 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/lager/v3"
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/caching"
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/client"

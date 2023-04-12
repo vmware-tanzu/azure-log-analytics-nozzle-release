@@ -1,6 +1,6 @@
  definitions:
   - name: "lager"
-    prefix: "code.cloudfoundry.org/lager"
+    prefix: "code.cloudfoundry.org/lager/v3"
     regex: 'code\.cloudfoundry\.org\/lager\|(?P<version>.*)$'
     url_template: 'https://codeload.github.com/cloudfoundry/lager/tar.gz/${version}'
     file_template: 'go_lager-${version}.tar.gz'
