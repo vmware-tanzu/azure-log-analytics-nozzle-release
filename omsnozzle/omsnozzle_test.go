@@ -8,7 +8,7 @@ import (
 
 	"code.cloudfoundry.org/lager/v3"
 	"github.com/cloudfoundry/sonde-go/events"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/mocks"
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/omsnozzle"
