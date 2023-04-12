@@ -160,7 +160,6 @@ var _ = Describe("Messages", func() {
 			Low:  &low,
 			High: &high,
 		}
-		requestId := appId
 		formattedUUID := "f803e6dc-3990-45e6-5478-851a104ffd0a"
 
 		startTimestamp := int64(10)
@@ -183,7 +182,7 @@ var _ = Describe("Messages", func() {
 		httpStartStop := events.HttpStartStop{
 			StartTimestamp: &startTimestamp,
 			StopTimestamp:  &stopTimestamp,
-			RequestId:      &requestId,
+			RequestId:      &appId,
 			PeerType:       &peerType,
 			Method:         &method,
 			Uri:            &uri,
