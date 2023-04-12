@@ -13,13 +13,13 @@ import (
 	"syscall"
 	"time"
 
-	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/lager/v3"
+	"github.com/alecthomas/kingpin/v2"
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/caching"
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/client"
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/firehose"
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/omsnozzle"
-	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 const (

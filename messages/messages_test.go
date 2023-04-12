@@ -13,7 +13,7 @@ import (
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/caching"
 
 	"github.com/cloudfoundry/sonde-go/events"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/messages"
 	"github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics/mocks"
@@ -160,7 +160,6 @@ var _ = Describe("Messages", func() {
 			Low:  &low,
 			High: &high,
 		}
-		requestId := appId
 		formattedUUID := "f803e6dc-3990-45e6-5478-851a104ffd0a"
 
 		startTimestamp := int64(10)
@@ -183,7 +182,7 @@ var _ = Describe("Messages", func() {
 		httpStartStop := events.HttpStartStop{
 			StartTimestamp: &startTimestamp,
 			StopTimestamp:  &stopTimestamp,
-			RequestId:      &requestId,
+			RequestId:      &appId,
 			PeerType:       &peerType,
 			Method:         &method,
 			Uri:            &uri,

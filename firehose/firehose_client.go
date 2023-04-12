@@ -7,9 +7,9 @@ import (
 	"crypto/tls"
 	"time"
 
-	"code.cloudfoundry.org/lager"
+	"code.cloudfoundry.org/lager/v3"
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/cloudfoundry/noaa/consumer"
+	"github.com/cloudfoundry/noaa/v2/consumer"
 	events "github.com/cloudfoundry/sonde-go/events"
 )
 
