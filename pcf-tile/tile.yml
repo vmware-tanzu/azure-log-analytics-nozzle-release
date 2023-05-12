@@ -26,6 +26,17 @@ packages:
   type: app
 #  label: My fabulous appplication      # Package name for use in human-readable labels in OpsManager
   pre_deploy: |
+    # redefine get_stack to prefer cflinuxfs4
+    function get_stack() {
+      stack="$($CF buildpacks | grep 'go_buildpack' | grep -o 'cflinuxfs[34]' | sort -uVr | head -n1)"
+      if [ -z "$stack" ]; then
+          echo >&2 "Using default stack"
+      else
+          echo >&2 "Using $stack stack"
+          echo "-s $stack"
+      fi
+    }
+
     cf delete-org -f azure-log-analytics-nozzle-org
   manifest:
     path: resources/azure-log-analytics-nozzle.zip
