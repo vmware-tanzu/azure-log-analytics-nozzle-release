@@ -12,7 +12,7 @@ require (
 require (
 	github.com/alecthomas/kingpin/v2 v2.3.2
 	github.com/cloudfoundry/noaa/v2 v2.2.0
-	github.com/onsi/ginkgo/v2 v2.9.5
+	github.com/onsi/ginkgo/v2 v2.9.7
 )
 
 require (
