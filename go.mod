@@ -3,7 +3,7 @@ module github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics
 go 1.20
 
 require (
-	code.cloudfoundry.org/lager/v3 v3.0.1
+	code.cloudfoundry.org/lager/v3 v3.0.2
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20210621174645-7773f7e22665
 	github.com/cloudfoundry/sonde-go v0.0.0-20220627221915-ff36de9c3435 // pinned
 	github.com/onsi/gomega v1.27.8
