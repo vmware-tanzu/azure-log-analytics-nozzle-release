@@ -49,6 +49,12 @@ packages:
       GOPACKAGENAME: github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics
   health_check: none
 
+release_overides:
+  cf-cli-release:
+    name: cf-cli-release
+    type: bosh-release
+    path: https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.45.0
+
 # Include stemcell criteria if you don't want to accept the default.
 # Since this stemcell is only used to run pre and post errands, we
 # strongly recommend you leave this alone so that your tile always
