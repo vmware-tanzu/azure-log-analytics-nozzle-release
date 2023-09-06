@@ -1,0 +1,28 @@
+# Options for analysis running.
+run:
+  # Timeout for analysis, e.g. 30s, 5m.
+  # Default: 1m
+  timeout: 5m
+
+# Options for linter choosing.
+linters:
+  # Enable specific linters.
+  # https://golangci-lint.run/usage/linters
+  enable:
+    # Checks for non-ASCII identifiers.
+    - asciicheck
+    # Inspects source code for security problems.
+    - gosec
+
+# Options for reporting issues.
+issues:
+  # Maximum issues count per one linter.
+  # Set to 0 to disable.
+  # Default: 50
+  max-issues-per-linter: 0
+
+  # Maximum count of issues with the same text.
+  # Set to 0 to disable.
+  # Default: 3
+  max-same-issues: 0
+
