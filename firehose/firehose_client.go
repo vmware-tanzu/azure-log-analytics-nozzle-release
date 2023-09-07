@@ -56,7 +56,7 @@ func (c *client) Connect() (<-chan *events.Envelope, <-chan error) {
 
 	c.consumer = consumer.New(
 		c.firehoseConfig.TrafficControllerUrl,
-		&tls.Config{InsecureSkipVerify: c.cfClientConfig.SkipSslValidation},
+		&tls.Config{InsecureSkipVerify: c.cfClientConfig.SkipSslValidation}, //nolint:gosec
 		nil)
 
 	refresher := CfClientTokenRefresh{cfClient: cfClient}

@@ -248,43 +248,45 @@ func (o *OmsNozzle) addEventCountEvent(name string, deltaCount uint64, count uin
 
 func (o *OmsNozzle) postData(events *map[string][]interface{}, addCount bool) {
 	for k, v := range *events {
-		if len(v) > 0 {
-			if msgAsJson, err := json.Marshal(&v); err != nil {
-				o.logger.Error("error marshalling message to JSON", err,
-					lager.Data{"event type": k},
-					lager.Data{"event count": len(v)})
-			} else {
-				o.logger.Debug("Posting to OMS",
-					lager.Data{"event type": k},
-					lager.Data{"event count": len(v)},
-					lager.Data{"total size": len(msgAsJson)})
-				if len(o.nozzleConfig.OmsTypePrefix) > 0 {
-					k = o.nozzleConfig.OmsTypePrefix + k
-				}
-				nRetries := 4
-				for nRetries > 0 {
-					requestStartTime := time.Now()
-					if err = o.omsClient.PostData(&msgAsJson, k); err != nil {
-						nRetries--
-						elapsedTime := time.Since(requestStartTime)
-						o.logger.Error("error posting message to OMS", err,
-							lager.Data{"event type": k},
-							lager.Data{"elapse time": elapsedTime.String()},
-							lager.Data{"event count": len(v)},
-							lager.Data{"total size": len(msgAsJson)},
-							lager.Data{"remaining attempts": nRetries})
-						time.Sleep(time.Second * 1)
-					} else {
-						if addCount {
-							atomic.AddUint64(&o.totalEventsSent, uint64(len(v)))
-							atomic.AddUint64(&o.totalDataSent, uint64(len(v)))
-						}
-						break
+		v := v
+		if len(v) <= 0 {
+			continue
+		}
+		if msgAsJson, err := json.Marshal(&v); err != nil {
+			o.logger.Error("error marshalling message to JSON", err,
+				lager.Data{"event type": k},
+				lager.Data{"event count": len(v)})
+		} else {
+			o.logger.Debug("Posting to OMS",
+				lager.Data{"event type": k},
+				lager.Data{"event count": len(v)},
+				lager.Data{"total size": len(msgAsJson)})
+			if len(o.nozzleConfig.OmsTypePrefix) > 0 {
+				k = o.nozzleConfig.OmsTypePrefix + k
+			}
+			nRetries := 4
+			for nRetries > 0 {
+				requestStartTime := time.Now()
+				if err = o.omsClient.PostData(&msgAsJson, k); err != nil {
+					nRetries--
+					elapsedTime := time.Since(requestStartTime)
+					o.logger.Error("error posting message to OMS", err,
+						lager.Data{"event type": k},
+						lager.Data{"elapse time": elapsedTime.String()},
+						lager.Data{"event count": len(v)},
+						lager.Data{"total size": len(msgAsJson)},
+						lager.Data{"remaining attempts": nRetries})
+					time.Sleep(time.Second * 1)
+				} else {
+					if addCount {
+						atomic.AddUint64(&o.totalEventsSent, uint64(len(v)))
+						atomic.AddUint64(&o.totalDataSent, uint64(len(v)))
 					}
+					break
 				}
-				if nRetries == 0 && addCount {
-					atomic.AddUint64(&o.totalEventsLost, uint64(len(v)))
-				}
+			}
+			if nRetries == 0 && addCount {
+				atomic.AddUint64(&o.totalEventsLost, uint64(len(v)))
 			}
 		}
 	}

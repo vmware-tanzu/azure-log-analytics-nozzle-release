@@ -94,7 +94,7 @@ func (c *Caching) Initialize() {
 	c.logger.Info("Cache initialize completed",
 		lager.Data{"cache size": len(c.appInfosByGuid)})
 	go func() {
-		time.Sleep(time.Duration(float64(c.cachingInterval) * rand.Float64()))
+		time.Sleep(time.Duration(float64(c.cachingInterval) * rand.Float64())) //nolint:gosec
 		ticker := time.NewTicker(c.cachingInterval)
 		for range ticker.C {
 			c.refreshCache()

@@ -4,7 +4,7 @@
 package messages_test
 
 import (
-	"crypto/md5"
+	"crypto/md5" //nolint: gosec
 	hex "encoding/hex"
 	"encoding/json"
 	"math"
@@ -70,7 +70,7 @@ var _ = Describe("Messages", func() {
 		Expect(m.IP).To(Equal(ip))
 		Expect(m.Tags).To(Equal("map[tag1:value1]"))
 		Expect(m.Job).To(Equal(job))
-		hash := md5.Sum([]byte(envelope.String()))
+		hash := md5.Sum([]byte(envelope.String())) //nolint: gosec
 		Expect(m.MessageHash).To(Equal(hex.EncodeToString(hash[:])))
 		Expect(m.Environment).To(Equal(environmentName))
 	})
@@ -428,11 +428,11 @@ var _ = Describe("Messages", func() {
 		unit := "count"
 		origin := "rep"
 		job := "job"
-		valueMetrics := make([]messages.ValueMetric, 0)
-		for _, value := range values {
+		valueMetrics := make([]messages.ValueMetric, len(values))
+		for i := range values {
 			metric := events.ValueMetric{
 				Name:  &name,
-				Value: &value,
+				Value: &values[i],
 				Unit:  &unit,
 			}
 
@@ -442,7 +442,7 @@ var _ = Describe("Messages", func() {
 				Job:         &job,
 				Origin:      &origin,
 			}
-			valueMetrics = append(valueMetrics, *messages.NewValueMetric(envelope, cache))
+			valueMetrics[i] = *messages.NewValueMetric(envelope, cache)
 		}
 
 		_, err := json.Marshal(valueMetrics)
