@@ -4,7 +4,7 @@
 package omsnozzle_test
 
 import (
-	"crypto/md5"
+	"crypto/md5" //nolint: gosec
 	"encoding/hex"
 	"time"
 
@@ -229,6 +229,6 @@ var _ = Describe("LogEventCount", func() {
 
 func encodeEnvelope(e *events.Envelope) string {
 	GinkgoHelper()
-	sum := md5.Sum([]byte(e.String()))
+	sum := md5.Sum([]byte(e.String())) //nolint: gosec
 	return hex.EncodeToString(sum[:])
 }

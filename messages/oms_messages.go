@@ -5,7 +5,7 @@ package messages
 
 import (
 	"bytes"
-	"crypto/md5"
+	"crypto/md5" //nolint: gosec
 	"encoding/binary"
 	hex "encoding/hex"
 	"fmt"
@@ -59,7 +59,7 @@ func NewBaseMessage(e *events.Envelope, c caching.CachingClient) *BaseMessage {
 		b.Tags = fmt.Sprintf("%v", e.GetTags())
 	}
 	// String() returns string from underlying protobuf message
-	var hash = md5.Sum([]byte(e.String()))
+	var hash = md5.Sum([]byte(e.String())) //nolint: gosec
 	b.MessageHash = hex.EncodeToString(hash[:])
 
 	return &b
