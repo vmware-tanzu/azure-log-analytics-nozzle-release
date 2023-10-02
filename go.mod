@@ -6,7 +6,7 @@ require (
 	code.cloudfoundry.org/lager/v3 v3.0.2
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20210621174645-7773f7e22665
 	github.com/cloudfoundry/sonde-go v0.0.0-20230710164515-a0a43d1dbbf8 // pinned
-	github.com/onsi/gomega v1.27.10
+	github.com/onsi/gomega v1.28.0
 )
 
 require (
