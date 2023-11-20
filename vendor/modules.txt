@@ -8,7 +8,7 @@ code.cloudfoundry.org/lager/v3/internal/truncate
 # github.com/Masterminds/semver v1.5.0
 ## explicit
 github.com/Masterminds/semver
-# github.com/alecthomas/kingpin/v2 v2.3.2
+# github.com/alecthomas/kingpin/v2 v2.4.0
 ## explicit; go 1.17
 github.com/alecthomas/kingpin/v2
 # github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137
