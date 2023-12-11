@@ -3,7 +3,7 @@ module github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics
 go 1.20
 
 require (
-	code.cloudfoundry.org/lager/v3 v3.0.2
+	code.cloudfoundry.org/lager/v3 v3.0.3
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20210621174645-7773f7e22665
 	github.com/cloudfoundry/sonde-go v0.0.0-20230710164515-a0a43d1dbbf8 // pinned
 	github.com/onsi/gomega v1.30.0
@@ -28,7 +28,7 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
-	github.com/openzipkin/zipkin-go v0.4.1 // indirect
+	github.com/openzipkin/zipkin-go v0.4.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
