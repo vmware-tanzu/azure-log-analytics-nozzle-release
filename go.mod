@@ -6,13 +6,13 @@ require (
 	code.cloudfoundry.org/lager/v3 v3.0.3
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20210621174645-7773f7e22665
 	github.com/cloudfoundry/sonde-go v0.0.0-20230710164515-a0a43d1dbbf8 // pinned
-	github.com/onsi/gomega v1.30.0
+	github.com/onsi/gomega v1.31.1
 )
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/noaa/v2 v2.3.0
-	github.com/onsi/ginkgo/v2 v2.14.0
+	github.com/onsi/ginkgo/v2 v2.15.0
 )
 
 require (
