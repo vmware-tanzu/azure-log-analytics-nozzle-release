@@ -1,6 +1,6 @@
 module github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics
 
-go 1.20
+go 1.21
 
 require (
 	code.cloudfoundry.org/lager/v3 v3.0.3
