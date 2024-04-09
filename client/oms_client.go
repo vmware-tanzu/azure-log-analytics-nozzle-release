@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/lager/v3"
+	"code.cloudfoundry.org/tlsconfig"
 )
 
 type Client interface {
@@ -83,7 +84,8 @@ func (c *client) PostData(msg *[]byte, logType string) error {
 	req.Header.Set("Content-Type", "application/json")
 
 	client := http.Client{
-		Timeout: c.httpPostTimeout,
+		Timeout:   c.httpPostTimeout,
+		Transport: transport(),
 	}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -110,4 +112,13 @@ func (c *client) buildSignature(date string, contentLength int, method string, c
 	encodedHash := base64.StdEncoding.EncodeToString(hasher.Sum(nil))
 	authorization := fmt.Sprintf("SharedKey %s:%s", c.customerID, encodedHash)
 	return authorization, err
+}
+
+func transport() http.RoundTripper {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	cfg, err := tlsconfig.Build(tlsconfig.WithExternalServiceDefaults()).Client()
+	if err == nil {
+		transport.TLSClientConfig = cfg
+	}
+	return transport
 }

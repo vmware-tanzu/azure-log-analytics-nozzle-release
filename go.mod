@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	code.cloudfoundry.org/tlsconfig v0.0.0-20240405144453-942277399864
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/noaa/v2 v2.4.0
 	github.com/onsi/ginkgo/v2 v2.17.1
@@ -33,7 +34,7 @@ require (
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20210810183815-faf39c7919d5 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.17.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect

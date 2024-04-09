@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/lager/v3"
+	"code.cloudfoundry.org/tlsconfig"
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry/noaa/v2/consumer"
 	events "github.com/cloudfoundry/sonde-go/events"
@@ -56,7 +57,7 @@ func (c *client) Connect() (<-chan *events.Envelope, <-chan error) {
 
 	c.consumer = consumer.New(
 		c.firehoseConfig.TrafficControllerUrl,
-		&tls.Config{InsecureSkipVerify: c.cfClientConfig.SkipSslValidation}, //nolint:gosec
+		tlsConfig(c.cfClientConfig.SkipSslValidation),
 		nil)
 
 	refresher := CfClientTokenRefresh{cfClient: cfClient}
@@ -67,4 +68,13 @@ func (c *client) Connect() (<-chan *events.Envelope, <-chan error) {
 
 func (c *client) CloseConsumer() error {
 	return c.consumer.Close()
+}
+
+func tlsConfig(insecureSkipVerify bool) *tls.Config {
+	cfg, err := tlsconfig.Build(tlsconfig.WithExternalServiceDefaults()).Client()
+	if err != nil {
+		cfg = &tls.Config{} //nolint:gosec
+	}
+	cfg.InsecureSkipVerify = insecureSkipVerify
+	return cfg
 }
