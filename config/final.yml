@@ -1,0 +1,5 @@
+name: nozzle-for-microsoft-azure-log-analytics
+blobstore:
+  provider: gcs
+  options:
+    bucket_name: nozzle-for-microsoft-azure-log-analytics-blobs

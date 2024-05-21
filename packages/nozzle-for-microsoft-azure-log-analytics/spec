@@ -1,0 +1,8 @@
+---
+name: nozzle-for-microsoft-azure-log-analytics
+
+dependencies:
+- golang-1.22-linux
+
+files:
+- '**/*'

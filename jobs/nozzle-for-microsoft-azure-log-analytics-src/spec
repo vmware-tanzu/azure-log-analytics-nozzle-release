@@ -1,0 +1,9 @@
+---
+name: nozzle-for-microsoft-azure-log-analytics-src
+
+templates: {}
+
+packages:
+- nozzle-for-microsoft-azure-log-analytics
+
+properties: {}

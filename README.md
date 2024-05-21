@@ -1,5 +1,10 @@
 # Nozzle for VMware Tanzu for Microsoft Azure Log Analytics
 
+> [!WARNING]
+> The supported way of deploying this nozzle is [https://network.pivotal.io/products/azure-nozzle/](https://network.pivotal.io/products/azure-nozzle/). The instructions below are for informational purposes and not supported by VMware by Broadcom.
+
+
+
 ## Summary
 
 Microsoft [Operations Management Suite](https://docs.microsoft.com/en-us/azure/operations-management-suite/) (OMS) is Microsoft's cloud-based IT management solution that helps you manage and protect your on-premises and cloud infrastructure.
@@ -8,14 +13,10 @@ Azure [Log Analytics](https://azure.microsoft.com/en-us/services/log-analytics/)
 
 The Nozzle for VMware Tanzu for Microsoft Azure Log Analytics is a Cloud Foundry (CF) component which forwards metrics from the [Loggregator](https://docs.cloudfoundry.org/loggregator/architecture.html) Firehose to OMS Log Analytics. In the following document, it will be referred to as `Nozzle for VMware Tanzu for Microsoft Azure Log Analytics` or `nozzle` for short.
 
-If you have any questions, or want to get attention for a PR or issue please reach out on the [#logging-and-metrics channel in the cloudfoundry slack](https://cloudfoundry.slack.com/archives/CUW93AF3M)
-
 ## Prerequisites
 
-### 1. Deploy a CF or PCF environment in Azure
+### 1. Access to a CF or PCF environment
 
-* [Deploy Cloud Foundry on Azure](https://github.com/cloudfoundry-incubator/bosh-azure-cpi-release/blob/master/docs/guidance.md)
-* [Deploy Pivotal Cloud Foundry on Azure](https://docs.pivotal.io/pivotalcf/1-9/customizing/azure.html)
 
 ### 2. Install CLIs on your dev box
 
@@ -32,7 +33,7 @@ If you have any questions, or want to get attention for a PR or issue please rea
 ### 1. Utilize the CF CLI to authenticate with your CF instance
 
 ```
-cf login -a https://api.${ENDPOINT} -u ${CF_USER} --skip-ssl-validation
+cf login -a https://api.${ENDPOINT} -u ${CF_USER}
 ```
 
 ### 2. Create a CF user and grant required privileges
@@ -40,7 +41,7 @@ cf login -a https://api.${ENDPOINT} -u ${CF_USER} --skip-ssl-validation
 The Nozzle for VMware Tanzu for Microsoft Azure Log Analytics requires a CF user who is authorized to access the loggregator firehose.
 
 ```
-uaac target https://uaa.${ENDPOINT} --skip-ssl-validation
+uaac target https://uaa.${ENDPOINT}
 uaac token client get admin
 cf create-user ${FIREHOSE_USER} ${FIREHOSE_USER_PASSWORD}
 uaac member add cloud_controller.admin ${FIREHOSE_USER}
@@ -51,10 +52,10 @@ uaac member add doppler.firehose ${FIREHOSE_USER}
 
 ```
 git clone https://github.com/vmware-tanzu/nozzle-for-microsoft-azure-log-analytics.git
-cd nozzle-for-microsoft-azure-log-analytics
+cd nozzle-for-microsoft-azure-log-analytics/src/
 ```
 
-### 4. Set environment variables in [manifest.yml](./manifest.yml)
+### 4. Set environment variables in [manifest.yml](src/manifest.yml)
 
 ```
 OMS_WORKSPACE             : OMS workspace ID
@@ -124,7 +125,7 @@ We did some workload test against the nozzle and got a few data for operaters' r
 
 ### 2. Scaling Loggregator
 
-Loggregator emits **LGR** log message to indicate problems with the logging process. When operaters see this message in OMS Log Analytics, they might need to [scale Loggregator](https://docs.cloudfoundry.org/running/managing-cf/logging-config.html#scaling).
+Loggregator emits **LGR** log message to indicate problems with the logging process. When operaters see this message in OMS Log Analytics, they might need to [scale Loggregator](https://docs.cloudfoundry.org/running/managing-cf/logging-config.html#scaling-loggregator).
 
 ## View in OMS Portal
 
@@ -134,7 +135,7 @@ With our [OMS Cloud Foundry Monitoring Solution](https://azuremarketplace.micros
 
 Please check [here](https://github.com/Azure/azure-quickstart-templates/tree/master/oms-cloudfoundry-solution) for detailed document and underlying templates.
 
-_You can find a complete list of KPI [here](https://docs.pivotal.io/pivotalcf/2-1/monitoring/kpi.html)._
+_You can find a complete list of KPI [here](https://docs.vmware.com/en/VMware-Tanzu-Application-Service/6.0/tas-for-vms/monitoring-kpi.html)._
 
 ### 2. Customizing your OMS Workplace
 
@@ -177,17 +178,17 @@ OMS Apps now available on [Windows (Mobile devices)](https://www.microsoft.com/e
 
 ## Test
 
-You need [ginkgo](https://github.com/onsi/ginkgo) to run the test. Run the following command to execute test:
+Run the following command in `src` to execute tests:
 
 ```
-ginkgo -r
+go test -v -race ./...
 ```
 
 ## Additional Reference
 
 To collect syslogs and performance metrics of VMs in CloudFoundry deployment, a system metric provider is required.
 
-For PCF 2.0+, ['Bosh System Metrics Forwarder`](https://github.com/cloudfoundry/bosh-system-metrics-forwarder-release) has been included in your deployment, VM metrics will be forwarded to loggregator automatically.
+For PCF 2.0+, [`Bosh System Metrics Forwarder`](https://github.com/cloudfoundry/bosh-system-metrics-forwarder-release) has been included in your deployment, VM metrics will be forwarded to loggregator automatically.
 
 At the same time, you can also install [`BOSH Health Metric Forwarder`](https://github.com/cloudfoundry/bosh-hm-forwarder-release) manually if you're using older version. Please refer to its document for instructions. _Be advanced, we have noticed that it might occasionally conflict with `Azure OMS Agent`._
 
