@@ -1,0 +1,7 @@
+#!/bin/bash -eux
+
+source /var/vcap/packages/golang-*-linux/bosh/compile.env
+export GOPATH=/var/vcap
+
+export CGO_ENABLED=0
+go build -mod=vendor -o "${BOSH_INSTALL_TARGET}/azure-oms-nozzle" ./main.go
