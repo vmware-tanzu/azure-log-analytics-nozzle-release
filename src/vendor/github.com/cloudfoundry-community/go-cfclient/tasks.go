@@ -34,6 +34,9 @@ type Task struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	DropletGUID string    `json:"droplet_guid"`
+	Relationships struct {
+		App V3ToOneRelationship `json:"app"`
+	} `json:"relationships"`
 	Links       struct {
 		Self    Link `json:"self"`
 		App     Link `json:"app"`
@@ -201,7 +204,7 @@ func (c *Client) TerminateTask(guid string) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 202 {
+	if resp.StatusCode != http.StatusAccepted {
 		return errors.Wrapf(err, "Failed terminating task, response status code %d", resp.StatusCode)
 	}
 	return nil
