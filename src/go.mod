@@ -7,7 +7,7 @@ toolchain go1.22.6
 require (
 	code.cloudfoundry.org/lager/v3 v3.0.3
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20220930021109-9c4e6c59ccf1
-	github.com/cloudfoundry/sonde-go v0.0.0-20240620221854-09ef53324489 // pinned
+	github.com/cloudfoundry/sonde-go v0.0.0-20240807231527-361c7ad33dc7 // pinned
 	github.com/onsi/gomega v1.34.1
 )
 
@@ -15,7 +15,7 @@ require (
 	code.cloudfoundry.org/tlsconfig v0.0.0-20240806182125-2cf75882e274
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/noaa/v2 v2.4.0
-	github.com/onsi/ginkgo/v2 v2.19.1
+	github.com/onsi/ginkgo/v2 v2.20.0
 )
 
 require (
