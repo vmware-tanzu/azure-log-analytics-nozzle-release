@@ -12,7 +12,7 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/tlsconfig v0.0.0-20240806182125-2cf75882e274
+	code.cloudfoundry.org/tlsconfig v0.0.0-20240808182450-b1b581e211a2
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/noaa/v2 v2.4.0
 	github.com/onsi/ginkgo/v2 v2.20.0
@@ -33,10 +33,10 @@ require (
 	github.com/openzipkin/zipkin-go v0.4.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
-	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
+	golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/oauth2 v0.22.0 // indirect
-	golang.org/x/sys v0.23.0 // indirect
+	golang.org/x/sys v0.24.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
