@@ -5,14 +5,14 @@ go 1.22.0
 toolchain go1.22.6
 
 require (
-	code.cloudfoundry.org/lager/v3 v3.0.3
+	code.cloudfoundry.org/lager/v3 v3.1.0
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20220930021109-9c4e6c59ccf1
 	github.com/cloudfoundry/sonde-go v0.0.0-20240807231527-361c7ad33dc7 // pinned
 	github.com/onsi/gomega v1.34.1
 )
 
 require (
-	code.cloudfoundry.org/tlsconfig v0.0.0-20240808182450-b1b581e211a2
+	code.cloudfoundry.org/tlsconfig v0.1.0
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/noaa/v2 v2.4.0
 	github.com/onsi/ginkgo/v2 v2.20.0
