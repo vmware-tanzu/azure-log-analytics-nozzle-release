@@ -15,7 +15,7 @@ require (
 	code.cloudfoundry.org/tlsconfig v0.1.0
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/noaa/v2 v2.4.0
-	github.com/onsi/ginkgo/v2 v2.20.0
+	github.com/onsi/ginkgo/v2 v2.20.1
 )
 
 require (
