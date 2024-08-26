@@ -5,7 +5,7 @@ go 1.22.0
 toolchain go1.22.6
 
 require (
-	code.cloudfoundry.org/lager/v3 v3.2.0
+	code.cloudfoundry.org/lager/v3 v3.3.0
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20220930021109-9c4e6c59ccf1
 	github.com/cloudfoundry/sonde-go v0.0.0-20240807231527-361c7ad33dc7 // pinned
 	github.com/onsi/gomega v1.34.1
