@@ -12,7 +12,7 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/tlsconfig v0.5.0
+	code.cloudfoundry.org/tlsconfig v0.6.0
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/noaa/v2 v2.5.0
 	github.com/onsi/ginkgo/v2 v2.20.2
