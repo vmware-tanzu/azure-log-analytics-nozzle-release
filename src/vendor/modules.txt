@@ -1,4 +1,4 @@
-# code.cloudfoundry.org/lager/v3 v3.9.0
+# code.cloudfoundry.org/lager/v3 v3.10.0
 ## explicit; go 1.22.0
 code.cloudfoundry.org/lager/v3
 code.cloudfoundry.org/lager/v3/internal/truncate
@@ -23,7 +23,7 @@ github.com/cloudfoundry/noaa/v2
 github.com/cloudfoundry/noaa/v2/consumer
 github.com/cloudfoundry/noaa/v2/consumer/internal
 github.com/cloudfoundry/noaa/v2/errors
-# github.com/cloudfoundry/sonde-go v0.0.0-20241007161526-e3ce7aa1aabc
+# github.com/cloudfoundry/sonde-go v0.0.0-20241016180203-3c0e1c24e908
 ## explicit; go 1.18
 github.com/cloudfoundry/sonde-go/events
 # github.com/fsnotify/fsnotify v1.7.0
@@ -46,7 +46,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20241009165004-a3522334989c
+# github.com/google/pprof v0.0.0-20241017200806-017d972448fc
 ## explicit; go 1.22
 github.com/google/pprof/profile
 # github.com/gorilla/websocket v1.5.3

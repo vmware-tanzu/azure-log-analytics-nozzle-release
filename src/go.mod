@@ -5,9 +5,9 @@ go 1.22.0
 toolchain go1.22.8
 
 require (
-	code.cloudfoundry.org/lager/v3 v3.9.0
+	code.cloudfoundry.org/lager/v3 v3.10.0
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20220930021109-9c4e6c59ccf1
-	github.com/cloudfoundry/sonde-go v0.0.0-20241007161526-e3ce7aa1aabc // pinned
+	github.com/cloudfoundry/sonde-go v0.0.0-20241016180203-3c0e1c24e908 // pinned
 	github.com/onsi/gomega v1.34.2
 )
 
@@ -26,7 +26,7 @@ require (
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20241009165004-a3522334989c // indirect
+	github.com/google/pprof v0.0.0-20241017200806-017d972448fc // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
