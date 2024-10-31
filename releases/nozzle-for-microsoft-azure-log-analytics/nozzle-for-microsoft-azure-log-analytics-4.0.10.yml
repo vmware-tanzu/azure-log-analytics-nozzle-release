@@ -1,0 +1,27 @@
+name: nozzle-for-microsoft-azure-log-analytics
+version: 4.0.10
+commit_hash: 4bba20f
+uncommitted_changes: false
+jobs:
+- name: nozzle-for-microsoft-azure-log-analytics-src
+  version: f68bb08253295baf194fe8ef589dff34de7b2d143af255951af09f0365ac1edf
+  fingerprint: f68bb08253295baf194fe8ef589dff34de7b2d143af255951af09f0365ac1edf
+  sha1: sha256:8e088e01279399b0f5164314e0fe853f5be520224b1e028d23f158f7928f4460
+  packages:
+  - nozzle-for-microsoft-azure-log-analytics
+packages:
+- name: golang-1.22-linux
+  version: e5be94e40f172c6cc6e39ccbfbdc350690604fe174db7e3bc4d3684a1801b8e5
+  fingerprint: e5be94e40f172c6cc6e39ccbfbdc350690604fe174db7e3bc4d3684a1801b8e5
+  sha1: sha256:c543c56a8c6827c0b8a85780060c3414abe860f5167f8e00963faaaf35c1d3c0
+  dependencies: []
+- name: nozzle-for-microsoft-azure-log-analytics
+  version: 88344bbb61700e730389677847fa28c1595a0f234316effb7781cd0b100e9d2b
+  fingerprint: 88344bbb61700e730389677847fa28c1595a0f234316effb7781cd0b100e9d2b
+  sha1: sha256:595bea62036f2d92283b360093b67f183e7bf4649a65d3c1c33f59ca9c7bb994
+  dependencies:
+  - golang-1.22-linux
+license:
+  version: 3bfe92b7dddf9ed98bc29182fcefa5d33fbac5ddc80614539699949646bb5439
+  fingerprint: 3bfe92b7dddf9ed98bc29182fcefa5d33fbac5ddc80614539699949646bb5439
+  sha1: sha256:7115068c8126e0b96f73936908ef66da960d94c54280ba3c71fb1feb5b5ff2e7
