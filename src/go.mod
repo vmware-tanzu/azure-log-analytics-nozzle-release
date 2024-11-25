@@ -12,10 +12,10 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/tlsconfig v0.9.0
+	code.cloudfoundry.org/tlsconfig v0.10.0
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/noaa/v2 v2.5.0
-	github.com/onsi/ginkgo/v2 v2.21.0
+	github.com/onsi/ginkgo/v2 v2.22.0
 )
 
 require (
@@ -26,7 +26,7 @@ require (
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20241101162523-b92577c0c142 // indirect
+	github.com/google/pprof v0.0.0-20241122213907-cbe949e5a41b // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
