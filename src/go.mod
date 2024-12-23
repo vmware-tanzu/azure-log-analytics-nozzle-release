@@ -5,17 +5,17 @@ go 1.22.0
 toolchain go1.22.10
 
 require (
-	code.cloudfoundry.org/lager/v3 v3.18.0
+	code.cloudfoundry.org/lager/v3 v3.19.0
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20220930021109-9c4e6c59ccf1
-	github.com/cloudfoundry/sonde-go v0.0.0-20241016180203-3c0e1c24e908 // pinned
+	github.com/cloudfoundry/sonde-go v0.0.0-20241223073712-8666f251e654 // pinned
 	github.com/onsi/gomega v1.36.1
 )
 
 require (
-	code.cloudfoundry.org/tlsconfig v0.12.0
+	code.cloudfoundry.org/tlsconfig v0.13.0
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/noaa/v2 v2.5.0
-	github.com/onsi/ginkgo/v2 v2.22.0
+	github.com/onsi/ginkgo/v2 v2.22.1
 )
 
 require (
@@ -33,12 +33,12 @@ require (
 	github.com/openzipkin/zipkin-go v0.4.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
-	golang.org/x/net v0.32.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/tools v0.28.0 // indirect
-	google.golang.org/protobuf v1.35.2 // indirect
+	google.golang.org/protobuf v1.36.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
